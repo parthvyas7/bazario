@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 const Cart = () => {
   const { cart, removeFromCart, increseQuantity, decreseQuantity, clearCart } =
     useCentralStore((state) => state);
+  
   return (
     <>
       <h1>Cart</h1>

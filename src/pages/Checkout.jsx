@@ -17,7 +17,6 @@ const Checkout = () => {
         addOrder(newOrder);
       }
     });
-    console.log(orders, "orders");
   };
   return (
     <>
