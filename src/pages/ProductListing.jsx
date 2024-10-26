@@ -1,9 +1,9 @@
-import { useCentralStore, useProducts } from "../store/store";
+import { useCentralStore } from "../store/store";
+import useProducts from "../hooks/useProducts";
 import { useNavigate } from "react-router-dom";
 
 const ProductListing = () => {
   const { isPending, error, data: products, isFetching } = useProducts();
-
   const { addToCart, removeFromCart, cart } = useCentralStore((state) => state);
 
   const handleAddToCart = (product) => {

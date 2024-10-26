@@ -1,30 +1,10 @@
 import { create } from 'zustand'
-import { useQuery } from "@tanstack/react-query";
-
-const fetchProducts = async () => {
-  const response = await fetch(
-    "https://api.escuelajs.co/api/v1/products?offset=0&limit=10"
-  );
-  return response.json();
-};
-
-export const useProducts = () => {
-  const setProducts = useCentralStore((state) => state.setProducts);
-  
-  const query = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-    onSuccess: (data) => {
-      setProducts(data);
-    },
-  });
-
-  return query;
-};
 
 const useCentralStore = create((set) => ({
   products: [],
-  setProducts: (products) => set({ products }),
+  setProducts: (newProducts) => {
+    set({ products: newProducts });
+  },
   addProduct: (product) => set((state) => ({ products: [...state.products, product] })),
   removeProduct: (product) => set((state) => ({ products: state.products.filter((productItem) => productItem.id !== product.id) })),
   clearProducts: () => set(() => ({ products: [] })),
