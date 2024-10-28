@@ -1,6 +1,12 @@
 import { create } from 'zustand'
 
-const useCentralStore = create((set) => ({
+export const useAuthStore = create(set => ({
+  user: null,
+  login: (user) => set({ user }),
+  logout: () => set({ user: null }),
+}));
+
+export const useCentralStore = create((set) => ({
   products: [],
   setProducts: (newProducts) => {
     set({ products: newProducts });
@@ -23,5 +29,3 @@ const useCentralStore = create((set) => ({
   removeOrder: (order) => set((state) => ({ orders: state.orders.filter((orderItem) => orderItem.id !== order.id) })),
   clearOrders: () => set(() => ({ orders: [] })),
 }))
-
-export { useCentralStore }
