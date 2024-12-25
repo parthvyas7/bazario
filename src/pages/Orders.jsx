@@ -11,7 +11,7 @@ const Orders = () => {
       <ul>
         {orders.map((order) => (
           <li key={order.id}>
-            {order.title}
+            {order.name}
             {order.deliveryStatus}
             {order.deliveredBy}
             <button

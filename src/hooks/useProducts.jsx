@@ -6,9 +6,10 @@ const useProducts = () => {
   const { setProducts } = useCentralStore((state) => state);
 
   const fetchProducts = async () => {
-    const { data: products, error } = await supabase.from('Products').select('*');
-    console.log(products)
-    
+    const { data: products, error } = await supabase
+      .from("Products")
+      .select("*");
+
     if (error) throw new Error(error.message);
     setProducts(products);
     return products;

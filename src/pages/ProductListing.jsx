@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const ProductListing = () => {
   const { isPending, error, data: products, isFetching } = useProducts();
   const { addToCart, removeFromCart, cart } = useCentralStore((state) => state);
-
+  
   const handleAddToCart = (product) => {
     cart.find((item) => item.id === product.id)
       ? removeFromCart(product)
@@ -33,7 +33,7 @@ const ProductListing = () => {
                 className="m-2 hover:underline cursor-pointer"
                 onClick={() => navigate(`/viewproduct/${product.id}`)}
               >
-                {product.title}
+                {product.name}
               </p>
               <button
                 onClick={() => handleAddToCart(product)}
