@@ -18,7 +18,7 @@ A React-based e-commerce platform using Supabase, Connects sellers and buyers wi
 
 To run this project, you will need to add the relevant environment variables to your `.env` file
 
-See `.env.sample`
+See `.env.example`
 
 ## Features
 
