@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { cartService } from '../services/supabase';
+import { cartService } from '../utils/services';
 
 export const useCartStore = create((set, get) => ({
   items: [],

@@ -1,90 +1,81 @@
-import { useState, useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { useAuthStore } from './stores/authStore'; 
+import PropTypes from 'prop-types';
 
-function App() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    userType: "buyer",
-  });
-  const [userData, setUserData] = useState({});
-  const handleFormInput = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-  const handleRegister = (e) => {
-    e.preventDefault();
-    fetch("https://reqres.in/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res && res.token) {
-          setUserData({
-            ...userData,
-            data: {
-              id: res.id,
-            },
-          });
-        }
-      })
-      .catch((error) => console.error("Error:", error));
-  };
+import { ProductListing, ShoppingCart, SellerDashboard, OrdersPage, SellerProfilePage, LoginForm, RegisterForm } from './components';
 
-  useEffect(() => {
-    if (userData.data) {
-      fetch(`https://reqres.in/api/users/${userData.data.id}`)
-        .then((res) => res.json())
-        .then((res) => setUserData(res));
-    }
-  }, [userData.data]);
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const { user, profile } = useAuthStore();
 
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (requiredRole && profile?.user_type !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+  requiredRole: PropTypes.string,
+};
+
+const App = () => {
   return (
-    <>
-      <nav>
-      <h1 className="text-3xl">Bazario</h1>
-      <form onSubmit={handleRegister}>
-        <input
-          className="border"
-          type="email"
-          name="email"
-          placeholder="email"
-          value={formData.email}
-          onChange={handleFormInput}
-        />
-        <input
-          className="border"
-          type="password"
-          name="password"
-          placeholder="password"
-          value={formData.password}
-          onChange={handleFormInput}
-        />
-        <button type="submit" className="bg-slate-300 p-2 rounded">
-          Register
-        </button>
-      </form>
-      <Link to="/viewcart">View Cart</Link>
-      {userData.data && (
-        <>
-          <p>Welcome!{userData.data.first_name}</p>
-        </>
-      )}
-      </nav>
-      <Link to='/productlisting'>Product Listing</Link>
-      <Link to='/orders'>View Orders</Link>
-      <Outlet />
-    </>
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        <nav className="bg-white shadow-md">
+          <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Bazario</h1>
+            <div className="flex space-x-4">
+              <Link to="/" className="hover:text-blue-600">Home</Link>
+              <Link to="/cart" className="hover:text-blue-600">Cart</Link>
+              <Link to="/orders" className="hover:text-blue-600">My Orders</Link>
+              <Link to="/seller-dashboard" className="hover:text-blue-600">Seller Dashboard</Link>
+              {/* Add login/logout buttons based on auth state */}
+            </div>
+          </div>
+        </nav>
+
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/" element={<ProductListing />} />
+          <Route path="/seller/:sellerId" element={<SellerProfilePage />} />
+
+          {/* Protected Routes */}
+          <Route 
+            path="/cart" 
+            element={
+              <ProtectedRoute requiredRole="buyer">
+                <ShoppingCart />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/orders" 
+            element={
+              <ProtectedRoute requiredRole="buyer">
+                <OrdersPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/seller-dashboard" 
+            element={
+              <ProtectedRoute requiredRole="seller">
+                <SellerDashboard />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;

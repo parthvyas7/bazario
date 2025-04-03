@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { productService } from '../services/supabase';
+import { productService } from '../utils/services';
 
 export const useProductStore = create((set) => ({
   products: [],
