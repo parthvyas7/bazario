@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore'; 
 import PropTypes from 'prop-types';
+import { Analytics } from "@vercel/analytics/react"
 
 import { ProductListing, ShoppingCart, SellerDashboard, OrdersPage, SellerProfilePage, LoginForm, RegisterForm } from './components';
 
@@ -74,6 +75,7 @@ const App = () => {
           />
         </Routes>
       </div>
+      <Analytics />
     </Router>
   );
 };
