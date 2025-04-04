@@ -1,9 +1,23 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
-import { useAuthStore } from './stores/authStore'; 
-import PropTypes from 'prop-types';
-import { Analytics } from "@vercel/analytics/react"
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Link,
+} from "react-router-dom";
+import { useAuthStore } from "./stores/authStore";
+import PropTypes from "prop-types";
+import { Analytics } from "@vercel/analytics/react";
 
-import { ProductListing, ShoppingCart, SellerDashboard, OrdersPage, SellerProfilePage, LoginForm, RegisterForm } from './components';
+import {
+  ProductListing,
+  ShoppingCart,
+  SellerDashboard,
+  OrdersPage,
+  SellerProfilePage,
+  LoginForm,
+  RegisterForm,
+} from "./components";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, profile } = useAuthStore();
@@ -32,10 +46,18 @@ const App = () => {
           <div className="container mx-auto px-4 py-3 flex justify-between items-center">
             <h1 className="text-2xl font-bold">Bazario</h1>
             <div className="flex space-x-4">
-              <Link to="/" className="hover:text-blue-600">Home</Link>
-              <Link to="/cart" className="hover:text-blue-600">Cart</Link>
-              <Link to="/orders" className="hover:text-blue-600">My Orders</Link>
-              <Link to="/seller-dashboard" className="hover:text-blue-600">Seller Dashboard</Link>
+              <Link to="/" className="hover:text-blue-600">
+                Home
+              </Link>
+              <Link to="/cart" className="hover:text-blue-600">
+                Cart
+              </Link>
+              <Link to="/orders" className="hover:text-blue-600">
+                My Orders
+              </Link>
+              <Link to="/seller-dashboard" className="hover:text-blue-600">
+                Seller Dashboard
+              </Link>
               {/* Add login/logout buttons based on auth state */}
             </div>
           </div>
@@ -49,29 +71,29 @@ const App = () => {
           <Route path="/seller/:sellerId" element={<SellerProfilePage />} />
 
           {/* Protected Routes */}
-          <Route 
-            path="/cart" 
+          <Route
+            path="/cart"
             element={
               <ProtectedRoute requiredRole="buyer">
                 <ShoppingCart />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/orders" 
+          <Route
+            path="/orders"
             element={
               <ProtectedRoute requiredRole="buyer">
                 <OrdersPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/seller-dashboard" 
+          <Route
+            path="/seller-dashboard"
             element={
               <ProtectedRoute requiredRole="seller">
                 <SellerDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
         </Routes>
       </div>
