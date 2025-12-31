@@ -2,7 +2,7 @@ import LoginForm from './auth/LoginForm';
 import RegisterForm from './auth/RegisterForm';
 import ProductListing from './buyer/ProductListing'
 import ShoppingCart from './buyer/ShoppingCart';
-import OrdersPage from './seller/OrdersPage';
+import BuyerOrders from '../pages/buyer/BuyerOrders';
 import SellerDashboard from './seller/SellerDashboard';
 import SellerProfilePage from './seller/SellerProfilePage';
 
@@ -11,7 +11,7 @@ export {
   RegisterForm,
   ProductListing,
   ShoppingCart,
-  OrdersPage,
+  BuyerOrders,
   SellerDashboard,
   SellerProfilePage
 };

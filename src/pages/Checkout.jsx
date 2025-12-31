@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
-import { orderService } from '../utils/orderService';
+import { orderService } from "../utils/services";
 import { CheckoutSummary } from '../components/buyer/CheckoutSummary';
 import { ShippingForm } from '../components/buyer/ShippingForm';
 import { PaymentForm } from '../components/buyer/PaymentForm';

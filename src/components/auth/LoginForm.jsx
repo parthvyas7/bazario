@@ -13,14 +13,18 @@ const LoginForm = () => {
     clearError();
 
     try {
-      const user = await signIn(email, password);
-      if (user.role === 'seller') {
-        navigate('/seller/dashboard');
-      } else {
-        navigate('/');
+      const { user } = await signIn(email, password);
+      if (user) {
+        // Redirect based on user role
+        if (user.user_type === 'seller') {
+          navigate('/seller-dashboard');
+        } else {
+          navigate('/');
+        }
       }
     } catch (err) {
-      // Error is handled by the store
+      console.error('Login error:', err);
+      // Error is already handled by the store
     }
   };
 

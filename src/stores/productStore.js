@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { productService } from '../utils/services';
 
-export const useProductStore = create((set) => ({
+export const useProductStore = create((set, get) => ({
   products: [],
   sellerProducts: [],
   currentProduct: null,
@@ -110,4 +110,4 @@ export const useProductStore = create((set) => ({
       }
     });
   }
-});
+}));

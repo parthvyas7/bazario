@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { sellerService } from '../../utils/sellerService';
-import { productService } from '../../utils/productService';
+import { sellerService } from "../../utils/services";
+import { productService } from "../../utils/services";
 import { ProductList } from '../../components/buyer/ProductList';
 import { SellerRating } from '../../components/buyer/SellerRating';
 import { CategoryFilter } from '../../components/common/CategoryFilter';

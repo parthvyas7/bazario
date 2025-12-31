@@ -66,18 +66,55 @@ export const authService = {
   },
 
   async getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
 
-    // Fetch additional user details
-    const { data: userData, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      // Fetch additional user details
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-    if (error) throw error;
-    return userData;
+      if (error) throw error;
+      return userData;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      throw error;
+    }
+  },
+  
+  async getProfile(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select(`
+          *,
+          seller:users_seller_fkey(*)
+        `)
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      
+      // Combine user and seller data
+      if (data.seller) {
+        return {
+          ...data,
+          ...data.seller,
+          user_type: 'seller'
+        };
+      }
+      
+      return {
+        ...data,
+        user_type: 'buyer'
+      };
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      throw error;
+    }
   }
 };
 
