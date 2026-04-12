@@ -26,40 +26,36 @@ export const SellerInfo = ({ sellerId }) => {
   if (!seller) return null;
 
   return (
-    <div className="bg-gray-50 border p-4 rounded-lg mt-6">
-      <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">
-        Sold By
-      </h4>
-      <div className="flex items-center justify-between">
-        <div>
-          <Link
-            to={`/seller/${seller.id}`}
-            className="text-lg font-bold hover:text-blue-600 flex items-center gap-2"
-          >
-            <span>{seller.store_name}</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-blue-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </Link>
-          <p className="text-gray-600 text-sm mt-1">
-            {seller.store_description}
-          </p>
+    <div className="p-6 rounded-2xl bg-surface-container-low relative overflow-hidden mt-6 shadow-sm border border-outline-variant/10">
+      <div className="flex items-center gap-4 relative z-10">
+        <div className="w-14 h-14 rounded-full overflow-hidden bg-white shadow-sm flex-shrink-0 flex items-center justify-center font-headline font-bold text-xl text-primary border border-surface-variant">
+          {seller.store_name?.charAt(0) || seller.users?.username?.charAt(0) || "S"}
         </div>
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-primary">{seller.store_name || seller.users?.username}</h3>
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-secondary text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+            <span className="text-sm font-medium text-on-surface-variant">Verified Merchant</span>
+          </div>
+        </div>
+      </div>
+      
+      {seller.store_description && (
+        <p className="mt-4 text-sm text-on-surface-variant relative z-10 line-clamp-2">
+          {seller.store_description}
+        </p>
+      )}
+      
+      <div className="mt-6 flex justify-between items-center relative z-10">
         <Link
           to={`/seller/${seller.id}`}
-          className="px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition-colors text-sm font-medium"
+          className="text-primary font-bold text-sm underline underline-offset-4 decoration-secondary hover:text-secondary transition-colors"
         >
-          View Store
+          View Store Collection
         </Link>
+        <button className="px-4 py-2 rounded-lg bg-white border border-outline-variant/20 text-primary hover:bg-surface-lowest text-xs font-bold shadow-sm transition-colors">
+          Contact
+        </button>
       </div>
     </div>
   );

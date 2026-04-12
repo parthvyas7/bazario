@@ -49,78 +49,95 @@ export const ProductReviews = ({ productId }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h3 className="text-2xl font-bold mb-6">Customer Reviews</h3>
+    <div className="bg-surface-container-lowest p-8 rounded-2xl shadow-sm border border-outline-variant/10">
+      <h3 className="text-2xl font-bold text-primary mb-8">Customer Reviews</h3>
 
       {/* Add Review Form */}
       {user && (
         <form
           onSubmit={handleSubmitReview}
-          className="mb-8 p-4 bg-gray-50 rounded-lg"
+          className="mb-10 p-6 bg-surface-container-low rounded-xl border border-surface-container-high"
         >
-          <h4 className="text-lg font-semibold mb-4">Write a Review</h4>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Rating</label>
-            <select
-              value={newReview.rating}
-              onChange={(e) =>
-                setNewReview({ ...newReview, rating: parseInt(e.target.value) })
-              }
-              className="p-2 border rounded"
+          <h4 className="text-lg font-bold text-primary mb-6">Write a Review</h4>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="md:col-span-3">
+              <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 ml-1">Rating</label>
+              <select
+                value={newReview.rating}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, rating: parseInt(e.target.value) })
+                }
+                className="w-full px-4 py-3 rounded-xl bg-surface-container-highest border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface font-medium outline-none cursor-pointer"
+              >
+                {[5, 4, 3, 2, 1].map((num) => (
+                  <option key={num} value={num}>
+                    {num} Stars
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="md:col-span-9">
+              <label className="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2 ml-1">Your Experience</label>
+              <textarea
+                value={newReview.comment}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, comment: e.target.value })
+                }
+                required
+                rows="3"
+                className="w-full px-5 py-4 rounded-xl bg-surface-container-highest border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface font-medium placeholder:text-outline-variant outline-none resize-none"
+                placeholder="What did you like or dislike about this product?"
+              />
+            </div>
+          </div>
+          <div className="mt-6 flex justify-end">
+            <button
+              type="submit"
+              className="bg-primary text-white font-bold px-8 py-3 rounded-full hover:bg-primary/90 transition-colors shadow-md"
             >
-              {[5, 4, 3, 2, 1].map((num) => (
-                <option key={num} value={num}>
-                  {num} Stars
-                </option>
-              ))}
-            </select>
+              Submit Review
+            </button>
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Comment</label>
-            <textarea
-              value={newReview.comment}
-              onChange={(e) =>
-                setNewReview({ ...newReview, comment: e.target.value })
-              }
-              required
-              rows="3"
-              className="w-full p-2 border rounded"
-              placeholder="What did you like or dislike?"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Submit Review
-          </button>
         </form>
       )}
 
       {/* Reviews List */}
       <div className="space-y-6">
         {loading ? (
-          <p>Loading reviews...</p>
+          <p className="text-on-surface-variant font-medium animate-pulse">Loading reviews...</p>
         ) : reviews.length === 0 ? (
-          <p className="text-gray-500">
-            No reviews yet. Be the first to review this product!
-          </p>
+          <div className="text-center py-12 bg-surface-container-low rounded-xl">
+            <span className="material-symbols-outlined text-outline-variant text-4xl mb-2">rate_review</span>
+            <p className="text-on-surface-variant font-medium">
+              No reviews yet. Be the first to review this product!
+            </p>
+          </div>
         ) : (
           reviews.map((review) => (
-            <div key={review.id} className="border-b pb-4 last:border-0">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold">
-                  {review.users?.username || "Anonymous"}
-                </span>
-                <span className="text-yellow-500">
-                  {"★".repeat(review.rating)}
-                  {"☆".repeat(5 - review.rating)}
-                </span>
+            <div key={review.id} className="border-b border-surface-container-highest pb-6 last:border-0 last:pb-0 pt-2">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                    {(review.users?.username?.[0] || "A").toUpperCase()}
+                  </div>
+                  <div>
+                    <span className="font-bold text-on-surface block leading-none mb-1">
+                      {review.users?.username || "Anonymous"}
+                    </span>
+                    <span className="text-xs text-on-surface-variant font-medium">
+                      {new Date(review.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex text-secondary text-sm">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="material-symbols-outlined" style={{fontVariationSettings: `'FILL' ${i < review.rating ? 1 : 0}`}}>
+                      star
+                    </span>
+                  ))}
+                </div>
               </div>
-              <p className="text-gray-700">{review.comment}</p>
-              <span className="text-xs text-gray-400 block mt-2">
-                {new Date(review.created_at).toLocaleDateString()}
-              </span>
+              <p className="text-on-surface-variant leading-relaxed pl-13 ml-13">{review.comment}</p>
             </div>
           ))
         )}

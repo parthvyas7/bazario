@@ -60,52 +60,49 @@ const App = () => {
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        <nav className="bg-white shadow-md">
-          <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-            <Link to="/" className="hover:text-blue-600">
-              <h1 className="text-2xl font-bold">Bazario</h1>
+        <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm">
+          <div className="flex justify-between items-center px-8 h-20 w-full max-w-[1920px] mx-auto">
+            {/* Brand Logo */}
+            <Link to="/" className="text-2xl font-bold text-primary font-headline tracking-tight hover:opacity-80 transition-opacity">
+              Bazario
             </Link>
-            <div className="flex items-center space-x-6">
+
+            {/* Navigation Links */}
+            <div className="flex items-center gap-8 font-headline tracking-tight">
               {user ? (
-                <div className="flex items-center space-x-6">
-                  <Link to="/cart" className="hover:text-blue-600">
+                <>
+                  <Link to="/" className="text-primary font-semibold hover:text-secondary transition-colors duration-300">
+                    Products
+                  </Link>
+                  <Link to="/cart" className="text-on-surface/70 hover:text-secondary transition-colors duration-300">
                     Cart
                   </Link>
-                  <Link to="/orders" className="hover:text-blue-600">
+                  <Link to="/orders" className="text-on-surface/70 hover:text-secondary transition-colors duration-300">
                     My Orders
                   </Link>
                   {profile?.user_type === "seller" && (
-                    <Link
-                      to="/seller-dashboard"
-                      className="hover:text-blue-600"
-                    >
+                    <Link to="/seller-dashboard" className="hidden lg:block text-on-surface/70 hover:text-secondary transition-colors duration-300">
                       Seller Dashboard
                     </Link>
                   )}
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm font-medium text-gray-700">
+                  <div className="flex items-center gap-4 ml-4">
+                    <span className="text-sm font-medium text-on-surface-variant truncate max-w-[150px]">
                       {profile?.username || user.email}
                     </span>
                     <button
                       onClick={handleSignOut}
-                      className="px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                      className="px-4 py-2 text-sm bg-error text-on-error rounded-full hover:bg-opacity-90 transition-colors shadow-sm"
                     >
                       Sign Out
                     </button>
                   </div>
-                </div>
+                </>
               ) : (
-                <div className="flex space-x-4">
-                  <Link
-                    to="/login"
-                    className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                  >
+                <div className="flex items-center gap-4">
+                  <Link to="/login" className="px-5 py-2 text-primary font-medium hover:bg-surface-container rounded-full transition-colors">
                     Login
                   </Link>
-                  <Link
-                    to="/register"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                  >
+                  <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold rounded-full hover:shadow-md transition-all">
                     Sign Up
                   </Link>
                 </div>
@@ -113,6 +110,9 @@ const App = () => {
             </div>
           </div>
         </nav>
+
+        {/* Content wrapper with top padding to account for fixed navbar */}
+        <div className="pt-20">
 
         <Routes>
           {/* Public Routes */}
@@ -164,6 +164,7 @@ const App = () => {
             }
           />
         </Routes>
+        </div>
       </div>
       <Analytics />
     </Router>
