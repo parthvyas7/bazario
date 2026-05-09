@@ -18,31 +18,6 @@ export const authService = {
 
       if (signUpError) throw signUpError;
 
-      // Insert additional user details into users table
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert({
-          id: data.user?.id,
-          email,
-          username: additionalData.username,
-          role
-        });
-
-      if (insertError) throw insertError;
-
-      // If seller, insert seller-specific details
-      if (role === 'seller') {
-        const { error: sellerError } = await supabase
-          .from('sellers')
-          .insert({
-            id: data.user?.id,
-            store_name: additionalData.storeName,
-            store_description: additionalData.storeDescription
-          });
-
-        if (sellerError) throw sellerError;
-      }
-
       return data;
     } catch (error) {
       console.error('Sign up error:', error);
@@ -75,9 +50,13 @@ export const authService = {
         .from('users')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!userData) {
+        await supabase.auth.signOut();
+        return null;
+      }
       return userData;
     } catch (error) {
       console.error('Error getting current user:', error);
@@ -91,12 +70,13 @@ export const authService = {
         .from('users')
         .select(`
           *,
-          seller:users_seller_fkey(*)
+          sellers(*)
         `)
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) return null;
       
       // Combine user and seller data
       if (data.seller) {
@@ -234,9 +214,9 @@ export const cartService = {
       .select('*')
       .eq('user_id', userId)
       .eq('product_id', productId)
-      .single();
+      .maybeSingle();
 
-    if (existingError && existingError.code !== 'PGRST116') throw existingError;
+    if (existingError) throw existingError;
 
     if (existingCartItem) {
       // Update quantity if item exists
@@ -290,7 +270,7 @@ export const sellerService = {
       .from('sellers')
       .select('*, users(email), products(*))')
       .eq('id', sellerId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data;
