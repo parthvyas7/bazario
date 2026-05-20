@@ -25,7 +25,15 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import BuyerHome from "./pages/BuyerHome";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const { user, profile } = useAuthStore();
+  const { user, profile, isLoading } = useAuthStore();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-surface">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -103,7 +111,7 @@ const App = () => {
                   )}
                   <div className="flex items-center gap-4 ml-4">
                     <span className="text-sm font-medium text-on-surface-variant truncate max-w-[150px]">
-                      {user.username || user.email}
+                      {user.full_name || user.store_name || user.email}
                     </span>
                     <button
                       onClick={handleSignOut}

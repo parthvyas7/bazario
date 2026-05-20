@@ -4,7 +4,7 @@ import supabase from "./supabase";
 export const authService = {
   async signUp(email, password, role, additionalData) {
     try {
-      // Sign up user
+      // Sign up user in Supabase Auth
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -17,7 +17,6 @@ export const authService = {
       });
 
       if (signUpError) throw signUpError;
-
       return data;
     } catch (error) {
       console.error('Sign up error:', error);
@@ -45,15 +44,96 @@ export const authService = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
 
-      // Fetch additional user details
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
+      const role = user.user_metadata?.role;
+      let userData = null;
 
-      if (error) throw error;
+      if (role === 'seller') {
+        const { data, error } = await supabase
+          .from('sellers')
+          .select('*')
+          .eq('seller_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        // Inject user_type, role, and email from auth since they aren't in sellers table by default
+        userData = data ? { ...data, user_type: 'seller', role: 'seller', email: user.email } : null;
+
+        // Self-heal: create missing seller profile from auth metadata
+        // sellers table has FK to buyers, so we need to create a buyers row first
+        if (!userData) {
+          const meta = user.user_metadata || {};
+          // Step 1: Ensure a buyers row exists (required by FK)
+          const { data: existingBuyer } = await supabase
+            .from('buyers')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (!existingBuyer) {
+            const { error: buyerErr } = await supabase
+              .from('buyers')
+              .insert({
+                id: user.id,
+                full_name: meta.username || meta.full_name || '',
+                email: user.email,
+                role: 'seller'
+              });
+            if (buyerErr) {
+              console.error('Failed to create base buyer profile for seller:', buyerErr);
+            }
+          }
+
+          // Step 2: Create the sellers row
+          const { data: newSeller, error: insertErr } = await supabase
+            .from('sellers')
+            .insert({
+              seller_id: user.id,
+              store_name: meta.storeName || meta.store_name || 'My Store',
+              description: meta.storeDescription || meta.store_description || ''
+            })
+            .select()
+            .single();
+
+          if (insertErr) {
+            console.error('Failed to create seller profile:', insertErr);
+          } else {
+            userData = { ...newSeller, user_type: 'seller', role: 'seller', email: user.email };
+          }
+        }
+      } else {
+        const { data, error } = await supabase
+          .from('buyers')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        userData = data ? { ...data, user_type: 'buyer', role: data.role || 'buyer' } : null;
+
+        // Self-heal: create missing buyer profile from auth metadata
+        if (!userData) {
+          const meta = user.user_metadata || {};
+          const { data: newBuyer, error: insertErr } = await supabase
+            .from('buyers')
+            .insert({
+              id: user.id,
+              full_name: meta.username || meta.full_name || '',
+              email: user.email,
+              role: 'buyer'
+            })
+            .select()
+            .single();
+
+          if (insertErr) {
+            console.error('Failed to create buyer profile:', insertErr);
+          } else {
+            userData = { ...newBuyer, user_type: 'buyer', role: newBuyer.role || 'buyer' };
+          }
+        }
+      }
+
       if (!userData) {
+        console.error('Could not find or create profile for user:', user.id);
         await supabase.auth.signOut();
         return null;
       }
@@ -66,31 +146,30 @@ export const authService = {
   
   async getProfile(userId) {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select(`
-          *,
-          sellers(*)
-        `)
-        .eq('id', userId)
-        .maybeSingle();
+      // Fetch from both tables concurrently since we don't know the role from userId alone
+      const [buyerRes, sellerRes] = await Promise.all([
+        supabase.from('buyers').select('*').eq('id', userId).maybeSingle(),
+        supabase.from('sellers').select('*').eq('seller_id', userId).maybeSingle()
+      ]);
 
-      if (error) throw error;
-      if (!data) return null;
+      if (buyerRes.error) throw buyerRes.error;
+      if (sellerRes.error) throw sellerRes.error;
       
-      // Combine user and seller data
-      if (data.seller) {
+      if (sellerRes.data) {
         return {
-          ...data,
-          ...data.seller,
+          ...sellerRes.data,
           user_type: 'seller'
         };
       }
       
-      return {
-        ...data,
-        user_type: 'buyer'
-      };
+      if (buyerRes.data) {
+        return {
+          ...buyerRes.data,
+          user_type: 'buyer'
+        };
+      }
+
+      return null;
     } catch (error) {
       console.error('Error fetching profile:', error);
       throw error;
@@ -100,6 +179,17 @@ export const authService = {
 
 // Product Service
 export const productService = {
+  async getProductById(productId) {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, sellers(store_name)')
+      .eq('id', productId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
   async createProduct(productData) {
     const { data, error } = await supabase
       .from('products')
@@ -164,13 +254,49 @@ export const productService = {
 // Order Service
 export const orderService = {
   async createOrder(orderData) {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert(orderData)
-      .select();
+    const sellerId = orderData.items[0]?.seller_id;
+    const shippingAddress = `${orderData.shippingInfo.fullName}, ${orderData.shippingInfo.address}, ${orderData.shippingInfo.city}, ${orderData.shippingInfo.postalCode}, ${orderData.shippingInfo.phone}`;
 
-    if (error) throw error;
-    return data[0];
+    // 1. Insert order
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        buyer_id: orderData.userId,
+        seller_id: sellerId,
+        total_amount: orderData.totalAmount,
+        status: orderData.status,
+        shipping_address: shippingAddress
+      })
+      .select()
+      .single();
+
+    if (orderError) throw orderError;
+
+    // 2. Insert order items
+    const orderItems = orderData.items.map(item => ({
+      order_id: order.id,
+      product_id: item.product_id || item.id,
+      quantity: item.quantity,
+      price_at_purchase: item.price
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(orderItems);
+
+    if (itemsError) throw itemsError;
+
+    // 3. Clear database cart
+    const { error: cartError } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('buyer_id', orderData.userId);
+
+    if (cartError) {
+      console.error('Failed to clear database cart after order creation:', cartError);
+    }
+
+    return order;
   },
 
   async updateOrderStatus(orderId, status) {
@@ -187,7 +313,7 @@ export const orderService = {
   async getSellerOrders(sellerId) {
     const { data, error } = await supabase
       .from('orders')
-      .select('*, order_items(*), users(username)')
+      .select('*, order_items(*), buyers(full_name)')
       .eq('seller_id', sellerId);
 
     if (error) throw error;
@@ -212,7 +338,7 @@ export const cartService = {
     const { data: existingCartItem, error: existingError } = await supabase
       .from('cart_items')
       .select('*')
-      .eq('user_id', userId)
+      .eq('buyer_id', userId)
       .eq('product_id', productId)
       .maybeSingle();
 
@@ -232,7 +358,7 @@ export const cartService = {
       const { data, error } = await supabase
         .from('cart_items')
         .insert({
-          user_id: userId,
+          buyer_id: userId,
           product_id: productId,
           quantity
         })
@@ -256,7 +382,7 @@ export const cartService = {
     const { data, error } = await supabase
       .from('cart_items')
       .select('*, products(*)')
-      .eq('user_id', userId);
+      .eq('buyer_id', userId);
 
     if (error) throw error;
     return data;
@@ -268,8 +394,8 @@ export const sellerService = {
   async getSellerProfile(sellerId) {
     const { data, error } = await supabase
       .from('sellers')
-      .select('*, users(email), products(*))')
-      .eq('id', sellerId)
+      .select('*, products(*)')
+      .eq('seller_id', sellerId)
       .maybeSingle();
 
     if (error) throw error;
@@ -280,7 +406,7 @@ export const sellerService = {
     const { data, error } = await supabase
       .from('sellers')
       .update(profileData)
-      .eq('id', sellerId)
+      .eq('seller_id', sellerId)
       .select();
 
     if (error) throw error;

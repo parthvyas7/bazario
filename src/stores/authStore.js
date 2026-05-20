@@ -4,7 +4,7 @@ import { authService } from '../utils/services';
 export const useAuthStore = create((set) => ({
   user: null,
   profile: null,
-  isLoading: false,
+  isLoading: true,
   error: null,
   
   initialize: async () => {
@@ -13,7 +13,7 @@ export const useAuthStore = create((set) => ({
       const user = await authService.getCurrentUser();
       if (user) {
         // Fetch profile data if needed
-        const { data: profile } = await authService.getProfile(user.id);
+        const profile = await authService.getProfile(user.id);
         set({ user, profile, isLoading: false });
       } else {
         set({ user: null, profile: null, isLoading: false });
@@ -30,7 +30,10 @@ export const useAuthStore = create((set) => ({
       const { user } = await authService.signIn(email, password);
       if (user) {
         const userData = await authService.getCurrentUser();
-        const { data: profile } = await authService.getProfile(user.id);
+        if (!userData) {
+          throw new Error('Your account profile could not be found. Please try registering again.');
+        }
+        const profile = await authService.getProfile(user.id);
         set({ user: userData, profile, isLoading: false });
         return { user: userData, profile };
       }

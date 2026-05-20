@@ -24,10 +24,10 @@ const Checkout = () => {
     if (!user) {
       navigate('/login?redirect=checkout');
     }
-    if (cart.length === 0) {
+    if (!isSubmitting && cart.length === 0) {
       navigate('/cart');
     }
-  }, [user, cart, navigate]);
+  }, [user, cart, navigate, isSubmitting]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

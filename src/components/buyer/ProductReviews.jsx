@@ -15,7 +15,7 @@ export const ProductReviews = ({ productId }) => {
   const fetchReviews = async () => {
     const { data, error } = await supabase
       .from("reviews")
-      .select("*, users(username)")
+      .select("*, buyers(full_name)")
       .eq("product_id", productId)
       .order("created_at", { ascending: false });
 
@@ -118,11 +118,11 @@ export const ProductReviews = ({ productId }) => {
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                    {(review.users?.username?.[0] || "A").toUpperCase()}
+                    {(review.buyers?.full_name?.[0] || "A").toUpperCase()}
                   </div>
                   <div>
                     <span className="font-bold text-on-surface block leading-none mb-1">
-                      {review.users?.username || "Anonymous"}
+                      {review.buyers?.full_name || "Anonymous"}
                     </span>
                     <span className="text-xs text-on-surface-variant font-medium">
                       {new Date(review.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}

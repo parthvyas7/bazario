@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import supabase from "../../utils/supabase";
-import { useAuthStore } from "../../stores/authStore";
 
 const BuyerOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { profile } = useAuthStore();
 
   useEffect(() => {
     fetchOrders();
@@ -22,7 +20,7 @@ const BuyerOrders = () => {
     const { data, error } = await supabase
       .from("orders")
       .select("*, order_items(*, products(*))")
-      .eq("user_id", user.id)
+      .eq("buyer_id", user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -145,13 +143,13 @@ const BuyerOrders = () => {
                         <div className="w-16 h-16 bg-surface-container-low rounded-lg overflow-hidden shrink-0 border border-outline-variant/10">
                           <img 
                             src={item.products.image_url || "/placeholder-image.png"} 
-                            alt={item.products.name} 
+                            alt={item.products.title} 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
                           />
                         </div>
                         <div className="flex-1">
-                          <p className="font-bold text-sm text-on-surface line-clamp-1">{item.products.name}</p>
-                          <p className="text-xs text-on-surface-variant">Qty: {item.quantity} • ${item.price_at_time.toFixed(2)} each</p>
+                          <p className="font-bold text-sm text-on-surface line-clamp-1">{item.products.title}</p>
+                          <p className="text-xs text-on-surface-variant">Qty: {item.quantity} • ${item.price_at_purchase.toFixed(2)} each</p>
                         </div>
                       </div>
                     ))}
