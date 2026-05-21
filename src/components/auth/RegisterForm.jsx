@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -13,9 +13,19 @@ const RegisterForm = () => {
     storeDescription: ''
   });
   
-  const { signUp, error, isLoading, clearError } = useAuthStore();
+  const { signUp, user, profile, error, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
   const [passwordError, setPasswordError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      if (profile?.user_type === 'seller') {
+        navigate('/seller-dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [user, profile, navigate]);
   
   const handleChange = (e) => {
     const { name, value } = e.target;

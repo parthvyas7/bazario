@@ -108,7 +108,7 @@ const Checkout = () => {
                       <span className="font-headline font-semibold text-sm">Qty: {item.quantity}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-secondary font-headline font-bold">$</span>
+                      <span className="text-secondary font-headline font-bold">₹</span>
                       <span className="text-on-surface font-headline font-bold text-xl ml-1">{item.price.toFixed(2)}</span>
                     </div>
                   </div>
@@ -240,21 +240,21 @@ const Checkout = () => {
               <div className="space-y-4 relative z-10">
                 <div className="flex justify-between items-center text-on-primary-container">
                   <span className="font-medium">Subtotal</span>
-                  <span className="font-headline font-bold">${calculateSubtotal().toFixed(2)}</span>
+                  <span className="font-headline font-bold">₹{calculateSubtotal().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-on-primary-container">
                   <span className="font-medium">Curator Shipping</span>
-                  <span className="font-headline font-bold">${shippingCost.toFixed(2)}</span>
+                  <span className="font-headline font-bold">₹{shippingCost.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center text-on-primary-container">
                   <span className="font-medium">GST (18%)</span>
-                  <span className="font-headline font-bold">${gstValue.toFixed(2)}</span>
+                  <span className="font-headline font-bold">₹{gstValue.toFixed(2)}</span>
                 </div>
                 <div className="h-px bg-white/10 my-4"></div>
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-xs font-bold text-on-primary-container uppercase tracking-widest">Total Amount</p>
-                    <p className="text-3xl font-headline font-extrabold tracking-tight">${grandTotal.toFixed(2)}</p>
+                    <p className="text-3xl font-headline font-extrabold tracking-tight">₹{grandTotal.toFixed(2)}</p>
                   </div>
                   <span className="bg-secondary px-3 py-1 rounded text-[10px] font-black uppercase mb-1">Secure SSL</span>
                 </div>

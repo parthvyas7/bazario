@@ -5,18 +5,31 @@ const DashboardContent = ({
   activeOrdersCount,
   products,
   orders,
+  onSignOut,
+  setActiveTab,
 }) => {
   return (
-    <div className="mt-20 p-8 flex flex-col gap-8 max-w-[1400px] mx-auto w-full">
+    <div className="p-8 flex flex-col gap-8 max-w-[1400px] mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
-        <div>
-          <h3 className="text-4xl font-extrabold tracking-tight text-primary">
-            Overview
-          </h3>
-          <p className="text-on-surface-variant mt-2">
-            Welcome back to your curation space. Here is your store's pulse
-            today.
-          </p>
+        <div className="flex justify-between items-start gap-4 w-full md:w-auto">
+          <div>
+            <h3 className="text-4xl font-extrabold tracking-tight text-primary">
+              Overview
+            </h3>
+            <p className="text-on-surface-variant mt-2">
+              Welcome back to your curation space. Here is your store's pulse
+              today.
+            </p>
+          </div>
+          {onSignOut && (
+            <button
+              onClick={onSignOut}
+              className="md:hidden p-2 text-error hover:bg-error/10 rounded-full flex items-center justify-center transition-all"
+              title="Sign Out"
+            >
+              <span className="material-symbols-outlined text-2xl">logout</span>
+            </button>
+          )}
         </div>
         <div className="flex gap-3">
           <button className="px-6 py-3 bg-surface-container-high rounded-full font-semibold text-sm hover:bg-surface-container-highest transition-colors">
@@ -35,7 +48,7 @@ const DashboardContent = ({
             Total Sales
           </p>
           <h4 className="text-3xl font-black text-primary">
-            ${totalSales.toFixed(2)}
+            ₹{totalSales.toFixed(2)}
           </h4>
           <div className="mt-4 flex items-center gap-2 text-xs font-bold text-tertiary-container bg-tertiary-container/10 w-fit px-2 py-1 rounded">
             <span
@@ -228,7 +241,10 @@ const DashboardContent = ({
               Quick Actions
             </h4>
             <div className="flex flex-col gap-3">
-              <button className="w-full p-4 bg-white rounded-xl flex items-center gap-4 hover:shadow-md hover:translate-y-[-2px] transition-all group">
+              <button 
+                onClick={() => setActiveTab && setActiveTab('add_product')}
+                className="w-full p-4 bg-white rounded-xl flex items-center gap-4 hover:shadow-md hover:translate-y-[-2px] transition-all group"
+              >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                   <span
                     className="material-symbols-outlined"

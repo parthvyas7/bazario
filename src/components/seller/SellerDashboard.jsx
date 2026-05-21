@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import supabase from '../../utils/supabase';
 
+import { useAuthStore } from '../../stores/authStore';
+
 import SellerSidebar from './SellerSidebar';
 import SellerMobileNav from './SellerMobileNav';
 import DashboardContent from './DashboardContent';
@@ -9,9 +11,18 @@ import AddProductContent from './AddProductContent';
 import StoreSetupContent from './StoreSetupContent';
 
 const SellerDashboard = () => {
+  const { profile, signOut } = useAuthStore();
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
   const [newProduct, setNewProduct] = useState({
     name: '',
     description: '',
@@ -129,7 +140,7 @@ const SellerDashboard = () => {
 
   return (
     <div className="flex bg-surface min-h-screen font-body">
-      <SellerSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <SellerSidebar activeTab={activeTab} setActiveTab={setActiveTab} profile={profile} onSignOut={handleSignOut} />
       
       <main className="flex-1 md:ml-64 flex flex-col bg-surface-bright pb-24 md:pb-0">
         {activeTab === 'overview' && (
@@ -138,6 +149,8 @@ const SellerDashboard = () => {
             activeOrdersCount={activeOrdersCount} 
             products={products} 
             orders={orders} 
+            onSignOut={handleSignOut}
+            setActiveTab={setActiveTab}
           />
         )}
         {activeTab === 'products' && (
@@ -157,7 +170,7 @@ const SellerDashboard = () => {
           />
         )}
         {activeTab === 'settings' && (
-          <StoreSetupContent />
+          <StoreSetupContent onSignOut={handleSignOut} />
         )}
         {activeTab === 'orders' && (
           <div className="flex-1 p-8 min-h-screen">
@@ -187,7 +200,7 @@ const SellerDashboard = () => {
                         >
                           {order.status}
                         </span>
-                        <p className="font-bold text-lg text-primary">${order.total_amount.toFixed(2)}</p>
+                        <p className="font-bold text-lg text-primary">₹{order.total_amount.toFixed(2)}</p>
                       </div>
                     </div>
                   </div>

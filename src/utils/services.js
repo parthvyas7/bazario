@@ -24,7 +24,35 @@ export const authService = {
     }
   },
 
-  async signIn(email, password) {
+  async signIn(email, password, role) {
+    if (role) {
+      const { data: buyerData, error: roleError } = await supabase
+        .from('buyers')
+        .select('id, role')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (roleError) {
+        throw new Error('Role verification failed. Please try again.');
+      }
+
+      if (!buyerData || buyerData.role !== role) {
+        throw new Error(`This email is not registered as a ${role}.`);
+      }
+
+      if (role === 'seller') {
+        const { data: sellerData, error: sellerError } = await supabase
+          .from('sellers')
+          .select('seller_id')
+          .eq('seller_id', buyerData.id)
+          .maybeSingle();
+
+        if (sellerError || !sellerData) {
+          throw new Error('This email is not registered as a seller.');
+        }
+      }
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password

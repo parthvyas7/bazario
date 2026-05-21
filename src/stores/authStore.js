@@ -5,6 +5,7 @@ export const useAuthStore = create((set) => ({
   user: null,
   profile: null,
   isLoading: true,
+  isInitialized: false,
   error: null,
   
   initialize: async () => {
@@ -14,20 +15,20 @@ export const useAuthStore = create((set) => ({
       if (user) {
         // Fetch profile data if needed
         const profile = await authService.getProfile(user.id);
-        set({ user, profile, isLoading: false });
+        set({ user, profile, isLoading: false, isInitialized: true });
       } else {
-        set({ user: null, profile: null, isLoading: false });
+        set({ user: null, profile: null, isLoading: false, isInitialized: true });
       }
     } catch (error) {
       console.error('Auth initialization error:', error);
-      set({ error: error.message, isLoading: false, user: null, profile: null });
+      set({ error: error.message, isLoading: false, isInitialized: true, user: null, profile: null });
     }
   },
   
-  signIn: async (email, password) => {
+  signIn: async (email, password, role) => {
     set({ isLoading: true, error: null });
     try {
-      const { user } = await authService.signIn(email, password);
+      const { user } = await authService.signIn(email, password, role);
       if (user) {
         const userData = await authService.getCurrentUser();
         if (!userData) {

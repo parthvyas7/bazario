@@ -52,7 +52,7 @@ ProtectedRoute.propTypes = {
 };
 
 const App = () => {
-  const { user, initialize, signOut } = useAuthStore();
+  const { user, profile, isInitialized, initialize, signOut } = useAuthStore();
 
   useEffect(() => {
     initialize();
@@ -66,91 +66,155 @@ const App = () => {
     }
   };
 
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-surface">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm">
-          <div className="flex justify-between items-center px-8 h-20 w-full max-w-[1920px] mx-auto">
-            {/* Brand Logo */}
-            <Link
-              to="/"
-              className="text-2xl font-bold text-primary font-headline tracking-tight hover:opacity-80 transition-opacity"
-            >
-              Bazario
-            </Link>
+        {profile?.user_type !== "seller" && (
+          <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm">
+            <div className="flex justify-between items-center px-8 h-20 w-full max-w-[1920px] mx-auto">
+              {/* Brand Logo */}
+              <Link
+                to={profile?.user_type === "seller" ? "/seller-dashboard" : "/"}
+                className="text-2xl font-bold text-primary font-headline tracking-tight hover:opacity-80 transition-opacity"
+              >
+                Bazario
+              </Link>
 
-            {/* Navigation Links */}
-            <div className="flex items-center gap-8 font-headline tracking-tight">
-              {user ? (
-                <>
-                  <Link
-                    to="/products"
-                    className="text-primary font-semibold hover:text-secondary transition-colors duration-300"
-                  >
-                    Products
-                  </Link>
-                  <Link
-                    to="/cart"
-                    className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
-                  >
-                    Cart
-                  </Link>
-                  <Link
-                    to="/orders"
-                    className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
-                  >
-                    My Orders
-                  </Link>
-                  {user?.role === "seller" && (
+              {/* Navigation Links */}
+              <div className="flex items-center gap-8 font-headline tracking-tight">
+                {user ? (
+                  <>
+                    {profile?.user_type === "buyer" && (
+                      <>
+                        <Link
+                          to="/products"
+                          className="text-primary font-semibold hover:text-secondary transition-colors duration-300"
+                        >
+                          Products
+                        </Link>
+                        <Link
+                          to="/cart"
+                          className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
+                        >
+                          Cart
+                        </Link>
+                        <Link
+                          to="/orders"
+                          className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
+                        >
+                          My Orders
+                        </Link>
+                      </>
+                    )}
+                    <div className="flex items-center gap-4 ml-4">
+                      <span className="text-sm font-medium text-on-surface-variant truncate max-w-[150px]">
+                        {profile?.store_name || profile?.full_name || user.email}
+                      </span>
+                      <button
+                        onClick={handleSignOut}
+                        className="px-4 py-2 text-sm bg-error text-on-error rounded-full hover:bg-opacity-90 transition-colors shadow-sm"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-4">
                     <Link
-                      to="/seller-dashboard"
-                      className="hidden lg:block text-on-surface/70 hover:text-secondary transition-colors duration-300"
+                      to="/login"
+                      className="px-5 py-2 text-primary font-medium hover:bg-surface-container rounded-full transition-colors"
                     >
-                      Seller Dashboard
+                      Login
                     </Link>
-                  )}
-                  <div className="flex items-center gap-4 ml-4">
-                    <span className="text-sm font-medium text-on-surface-variant truncate max-w-[150px]">
-                      {user.full_name || user.store_name || user.email}
-                    </span>
-                    <button
-                      onClick={handleSignOut}
-                      className="px-4 py-2 text-sm bg-error text-on-error rounded-full hover:bg-opacity-90 transition-colors shadow-sm"
+                    <Link
+                      to="/register"
+                      className="px-5 py-2 bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold rounded-full hover:shadow-md transition-all"
                     >
-                      Sign Out
-                    </button>
+                      Sign Up
+                    </Link>
                   </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <Link
-                    to="/login"
-                    className="px-5 py-2 text-primary font-medium hover:bg-surface-container rounded-full transition-colors"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-5 py-2 bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold rounded-full hover:shadow-md transition-all"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
+        )}
 
         {/* Content wrapper with top padding to account for fixed navbar */}
-        <div className="pt-20">
+        <div className={profile?.user_type === "seller" ? "" : "pt-20"}>
           <Routes>
             {/* Public Routes */}
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<RegisterForm />} />
-            <Route path="/" element={<BuyerHome />} />
-            <Route path="/products" element={<ProductListing />} />
-            <Route path="/product/:productId" element={<ProductDetail />} />
-            <Route path="/seller/:sellerId" element={<SellerProfilePage />} />
+            <Route
+              path="/login"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : user ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <LoginForm />
+                )
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : user ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <RegisterForm />
+                )
+              }
+            />
+            <Route
+              path="/"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : (
+                  <BuyerHome />
+                )
+              }
+            />
+            <Route
+              path="/products"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : (
+                  <ProductListing />
+                )
+              }
+            />
+            <Route
+              path="/product/:productId"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : (
+                  <ProductDetail />
+                )
+              }
+            />
+            <Route
+              path="/seller/:sellerId"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : (
+                  <SellerProfilePage />
+                )
+              }
+            />
 
             {/* Protected Routes */}
             <Route
@@ -191,6 +255,16 @@ const App = () => {
                 <ProtectedRoute requiredRole="seller">
                   <SellerDashboard />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                profile?.user_type === "seller" ? (
+                  <Navigate to="/seller-dashboard" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
               }
             />
           </Routes>

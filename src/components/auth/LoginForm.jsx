@@ -1,21 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn, error, isLoading, clearError } = useAuthStore();
+  const [loginRole, setLoginRole] = useState('buyer');
+  const { signIn, user, profile, error, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      if (profile?.user_type === 'seller') {
+        navigate('/seller-dashboard', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [user, profile, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
 
     try {
-      const { user } = await signIn(email, password);
-      if (user) {
-        if (user.user_type === 'seller') {
+      const { user: loggedInUser } = await signIn(email, password, loginRole);
+      if (loggedInUser) {
+        if (loginRole === 'seller' || loggedInUser.user_type === 'seller') {
           navigate('/seller-dashboard');
         } else {
           navigate('/');
@@ -80,6 +91,33 @@ const LoginForm = () => {
               {error}
             </div>
           )}
+
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <button 
+              type="button"
+              onClick={() => setLoginRole('buyer')}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
+                loginRole === 'buyer' 
+                  ? 'border-primary bg-primary/5 text-primary' 
+                  : 'border-transparent bg-surface-container-high text-on-surface-variant hover:bg-surface-variant'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl" style={{fontVariationSettings: "'FILL' 0"}}>shopping_bag</span>
+              <span className="text-sm">Login as Buyer</span>
+            </button>
+            <button 
+              type="button"
+              onClick={() => setLoginRole('seller')}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 font-semibold transition-all ${
+                loginRole === 'seller' 
+                  ? 'border-primary bg-primary/5 text-primary' 
+                  : 'border-transparent bg-surface-container-high text-on-surface-variant hover:bg-surface-variant'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl" style={{fontVariationSettings: "'FILL' 0"}}>storefront</span>
+              <span className="text-sm">Login as Seller</span>
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">

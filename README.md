@@ -10,6 +10,8 @@ A React-based e-commerce platform using Supabase, Connects sellers and buyers wi
 
 [Visit](https://bazario.vercel.app/)
 
+[Stitch Prototype](https://stitch.withgoogle.com/preview/3842891001526214468?node-id=4c6337dc2ea64b3f8b871554f4847ca4)
+
 ## Screenshots
 
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)

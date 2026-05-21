@@ -79,7 +79,7 @@ const BuyerHome = () => {
               <span className="text-secondary-fixed-dim font-headline font-bold text-sm">FOOTWEAR</span>
               <h3 className="text-white text-3xl font-headline font-bold">The Heritage Brogue</h3>
               <p className="text-surface-container mb-4">Crafted in Kanpur</p>
-              <span className="text-2xl font-headline font-bold text-white">$84.99</span>
+              <span className="text-2xl font-headline font-bold text-white">₹84.99</span>
             </div>
           </div>
           <div className="bg-surface-container-lowest rounded-xl overflow-hidden relative group">
@@ -87,14 +87,14 @@ const BuyerHome = () => {
             <div className="absolute inset-0 bg-on-surface/20 group-hover:bg-on-surface/40 transition-colors"></div>
             <div className="absolute bottom-4 left-4">
               <h4 className="text-white font-headline font-bold">Earthware Set</h4>
-              <span className="text-white/80 font-bold">$21.00</span>
+              <span className="text-white/80 font-bold">₹21.00</span>
             </div>
           </div>
           <div className="bg-surface-container-lowest rounded-xl overflow-hidden relative group">
             <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="brass lamp" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaQJADG-XcNboh__rQpU-QSbI0TJDANopJLXGRqnOaRNrzsJLrCD3tJh8M5MpWs4l3Rrpg3W5QqYT4mJxMPAT9dYKqhPQVncN-WbOJkNEh5TuzPod_c0Y6J3Xoq7RyOVRdODUmhAlNo1qaDsKpVOywmQqedJwh_Mby6GJjW8WgAo8eMkcTsuRz_jzvicKiiVOnLMu4m-OOj58C_aaNe-u0vkBX_JAggZBs05m8H2xpFeqNQMTLOBQuFTa8GpEqbDkxCxqf67XhPuQ"/>
             <div className="absolute bottom-4 left-4">
               <h4 className="text-white font-headline font-bold">Lume Brass Lamp</h4>
-              <span className="text-white/80 font-bold">$49.50</span>
+              <span className="text-white/80 font-bold">₹49.50</span>
             </div>
           </div>
           <div className="md:col-span-2 bg-surface-container-lowest rounded-xl overflow-hidden relative group">
@@ -102,7 +102,7 @@ const BuyerHome = () => {
             <div className="absolute top-4 left-4 bg-secondary px-3 py-1 rounded-full text-white text-xs font-bold">PREMIUM TECH</div>
             <div className="absolute bottom-8 left-8">
               <h4 className="text-white text-2xl font-headline font-bold">Optic X10 India Edition</h4>
-              <span className="text-white/90 font-bold text-xl">$1,240.00</span>
+              <span className="text-white/90 font-bold text-xl">₹1,240.00</span>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ const BuyerHome = () => {
                   </div>
                   <div className="flex justify-between items-center mt-auto">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-secondary font-headline font-bold">$</span>
+                      <span className="text-secondary font-headline font-bold">₹</span>
                       <span className="text-xl font-headline font-extrabold text-on-surface">{product.price}</span>
                     </div>
                     <button onClick={() => handleAddToCart(product)} className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors">

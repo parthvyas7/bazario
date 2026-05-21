@@ -145,7 +145,7 @@ const SellerProfilePage = () => {
                   <p className="text-sm font-body text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">{product.description}</p>
                   
                   <div className="mt-auto flex items-center justify-between pt-4 border-t border-surface-container-highest">
-                    <p className="font-headline font-black text-xl text-primary">${product.price.toFixed(2)}</p>
+                    <p className="font-headline font-black text-xl text-primary">₹{product.price.toFixed(2)}</p>
                     <button 
                       onClick={() => addToCart(product)}
                       className="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors duration-300"

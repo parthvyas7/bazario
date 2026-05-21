@@ -125,7 +125,7 @@ const BuyerOrders = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold font-headline text-on-surface"><span className="text-secondary">$</span>{order.total_amount.toFixed(2)}</p>
+                      <p className="font-bold font-headline text-on-surface"><span className="text-secondary">₹</span>{order.total_amount.toFixed(2)}</p>
                       <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded leading-none inline-block mt-1
                         ${order.status === "Pending" ? "bg-secondary-fixed text-on-secondary-fixed" : 
                           order.status === "Shipped" ? "bg-tertiary-container/10 text-tertiary-container" : 
@@ -149,7 +149,7 @@ const BuyerOrders = () => {
                         </div>
                         <div className="flex-1">
                           <p className="font-bold text-sm text-on-surface line-clamp-1">{item.products.title}</p>
-                          <p className="text-xs text-on-surface-variant">Qty: {item.quantity} • ${item.price_at_purchase.toFixed(2)} each</p>
+                          <p className="text-xs text-on-surface-variant">Qty: {item.quantity} • ₹{item.price_at_purchase.toFixed(2)} each</p>
                         </div>
                       </div>
                     ))}

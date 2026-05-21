@@ -69,7 +69,7 @@ const ProductListing = () => {
               </h3>
             </Link>
             <p className="text-gray-600 mb-2">{product.description}</p>
-            <p className="text-lg font-semibold mb-2">${product.price}</p>
+            <p className="text-lg font-semibold mb-2">₹{product.price}</p>
             <p className="text-sm text-gray-500 mb-2">
               Store: {product.sellers?.store_name || "Unknown"}
             </p>

@@ -101,7 +101,7 @@ const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
             Product &amp; Category
           </div>
           <div className="col-span-2 text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-            Price ($)
+            Price (₹)
           </div>
           <div className="col-span-2 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-center">
             Stock Level
@@ -136,7 +136,7 @@ const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
             </div>
             <div className="col-span-2">
               <p className="font-headline font-bold text-on-surface text-lg">
-                <span className="text-secondary mr-1">$</span>
+                <span className="text-secondary mr-1">₹</span>
                 {product.price.toFixed(2)}
               </p>
             </div>

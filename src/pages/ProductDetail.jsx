@@ -86,7 +86,7 @@ const ProductDetail = () => {
               <h1 className="text-4xl font-extrabold text-primary mb-4 leading-tight">{currentProduct.name}</h1>
               
               <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-3xl font-headline font-bold text-secondary">$</span>
+                <span className="text-3xl font-headline font-bold text-secondary">₹</span>
                 <span className="text-5xl font-headline font-black text-on-surface tracking-tighter">{currentProduct.price.toFixed(2)}</span>
               </div>
               
