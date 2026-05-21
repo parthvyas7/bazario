@@ -8,6 +8,56 @@ const DashboardContent = ({
   onSignOut,
   setActiveTab,
 }) => {
+  // 1. Calculate sales trend (percentage change in the last 30 days vs 30 days prior)
+  const calculateSalesTrend = () => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+    let currentSales = 0;
+    let previousSales = 0;
+
+    orders.forEach((order) => {
+      const orderDate = new Date(order.created_at);
+      if (orderDate >= thirtyDaysAgo && orderDate <= now) {
+        currentSales += order.total_amount || 0;
+      } else if (orderDate >= sixtyDaysAgo && orderDate < thirtyDaysAgo) {
+        previousSales += order.total_amount || 0;
+      }
+    });
+
+    if (previousSales === 0) {
+      return currentSales > 0 ? 100 : 0;
+    }
+    return ((currentSales - previousSales) / previousSales) * 100;
+  };
+
+  const salesTrend = calculateSalesTrend();
+  const salesTrendText = `${salesTrend >= 0 ? "+" : ""}${salesTrend.toFixed(1)}% vs last month`;
+  const salesTrendIcon = salesTrend >= 0 ? "trending_up" : "trending_down";
+  const salesTrendColorClass = salesTrend >= 0 
+    ? "text-tertiary-container bg-tertiary-container/10" 
+    : "text-error bg-error/10";
+
+  // 2. Calculate pending dispatch orders
+  const pendingDispatchCount = orders.filter((o) => o.status === "Pending").length;
+
+  // 3. Calculate in stock percentage
+  const inStockPercentage = products.length > 0 
+    ? (products.filter((p) => (p.stock_quantity || 0) > 0).length / products.length) * 100 
+    : 0;
+
+  // Helper to summarize products in an order
+  const getOrderProductText = (order) => {
+    const items = order.order_items || [];
+    if (items.length === 0) return "N/A";
+    const firstProductName = items[0]?.products?.name || "Unknown Product";
+    if (items.length > 1) {
+      return `${firstProductName} (+${items.length - 1} more)`;
+    }
+    return firstProductName;
+  };
+
   return (
     <div className="p-8 flex flex-col gap-8 max-w-[1400px] mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
@@ -32,12 +82,24 @@ const DashboardContent = ({
           )}
         </div>
         <div className="flex gap-3">
-          <button className="px-6 py-3 bg-surface-container-high rounded-full font-semibold text-sm hover:bg-surface-container-highest transition-colors">
-            View Analytics
-          </button>
-          <button className="px-6 py-3 bg-gradient-to-r from-primary to-primary-container text-white rounded-full font-semibold text-sm shadow-md hover:scale-[0.98] transition-transform">
-            Download Report
-          </button>
+          <div className="relative group">
+            <button className="px-6 py-3 bg-surface-container-high rounded-full font-semibold text-sm hover:bg-surface-container-highest transition-colors">
+              View Analytics
+            </button>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-neutral-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+              Coming soon...
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-neutral-900"></div>
+            </div>
+          </div>
+          <div className="relative group">
+            <button className="px-6 py-3 bg-gradient-to-r from-primary to-primary-container text-white rounded-full font-semibold text-sm shadow-md hover:scale-[0.98] transition-transform">
+              Download Report
+            </button>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-neutral-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+              Coming soon...
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-neutral-900"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -50,14 +112,14 @@ const DashboardContent = ({
           <h4 className="text-3xl font-black text-primary">
             ₹{totalSales.toFixed(2)}
           </h4>
-          <div className="mt-4 flex items-center gap-2 text-xs font-bold text-tertiary-container bg-tertiary-container/10 w-fit px-2 py-1 rounded">
+          <div className={`mt-4 flex items-center gap-2 text-xs font-bold ${salesTrendColorClass} w-fit px-2 py-1 rounded`}>
             <span
               className="material-symbols-outlined text-xs"
-              data-icon="trending_up"
+              data-icon={salesTrendIcon}
             >
-              trending_up
+              {salesTrendIcon}
             </span>
-            +12.5% vs last month
+            {salesTrendText}
           </div>
         </div>
 
@@ -76,7 +138,7 @@ const DashboardContent = ({
             >
               timer
             </span>
-            8 urgent dispatch
+            {pendingDispatchCount} pending dispatch
           </div>
         </div>
 
@@ -95,7 +157,7 @@ const DashboardContent = ({
             >
               inventory
             </span>
-            92% in stock
+            {inStockPercentage.toFixed(0)}% in stock
           </div>
         </div>
 
@@ -149,12 +211,15 @@ const DashboardContent = ({
         <div className="lg:col-span-2 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h4 className="text-xl font-bold text-primary">Recent Orders</h4>
-            <a
-              className="text-sm font-semibold text-secondary hover:underline"
-              href="#"
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab('orders');
+              }}
+              className="text-sm font-semibold text-secondary hover:underline bg-transparent border-none p-0 cursor-pointer"
             >
               View All Orders
-            </a>
+            </button>
           </div>
           <div className="flex flex-col gap-1">
             <div className="grid grid-cols-5 px-6 py-4 bg-surface-container-high rounded-t-xl text-xs font-bold uppercase tracking-widest text-on-surface-variant">
@@ -165,73 +230,47 @@ const DashboardContent = ({
               <div className="col-span-1 text-right">Status</div>
             </div>
 
-            <div className="grid grid-cols-5 px-6 py-5 bg-surface-container-lowest items-center group hover:bg-white transition-colors">
-              <div className="col-span-1 font-mono text-sm">#BZ-9042</div>
-              <div className="col-span-1 text-sm font-semibold">
-                Kabir Singh
+            {orders.length === 0 ? (
+              <div className="text-center py-12 bg-surface-container-lowest rounded-b-xl border border-outline-variant/10">
+                <span className="material-symbols-outlined text-4xl text-outline-variant mb-2">inbox</span>
+                <p className="text-on-surface-variant font-medium">No orders received yet.</p>
               </div>
-              <div className="col-span-1 text-sm truncate pr-4 italic">
-                Handcrafted Ceramic Vase
-              </div>
-              <div className="col-span-1 text-sm font-bold text-primary">
-                ₹ 4,200
-              </div>
-              <div className="col-span-1 text-right">
-                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-secondary/10 text-secondary border border-secondary/20">
-                  Pending
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-5 px-6 py-5 bg-surface-container-lowest items-center group hover:bg-white transition-colors">
-              <div className="col-span-1 font-mono text-sm">#BZ-9038</div>
-              <div className="col-span-1 text-sm font-semibold">
-                Ananya Iyer
-              </div>
-              <div className="col-span-1 text-sm truncate pr-4 italic">
-                Indigo Cotton Saree
-              </div>
-              <div className="col-span-1 text-sm font-bold text-primary">
-                ₹ 12,800
-              </div>
-              <div className="col-span-1 text-right">
-                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-primary-fixed text-primary border border-primary/20">
-                  Shipped
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-5 px-6 py-5 bg-surface-container-lowest items-center group hover:bg-white transition-colors">
-              <div className="col-span-1 font-mono text-sm">#BZ-8991</div>
-              <div className="col-span-1 text-sm font-semibold">Rohan Das</div>
-              <div className="col-span-1 text-sm truncate pr-4 italic">
-                Walnut Wood Lamp
-              </div>
-              <div className="col-span-1 text-sm font-bold text-primary">
-                ₹ 8,450
-              </div>
-              <div className="col-span-1 text-right">
-                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20">
-                  Delivered
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-5 px-6 py-5 bg-surface-container-lowest items-center group hover:bg-white transition-colors rounded-b-xl">
-              <div className="col-span-1 font-mono text-sm">#BZ-8985</div>
-              <div className="col-span-1 text-sm font-semibold">Meera Sen</div>
-              <div className="col-span-1 text-sm truncate pr-4 italic">
-                Brass Spice Box
-              </div>
-              <div className="col-span-1 text-sm font-bold text-primary">
-                ₹ 2,900
-              </div>
-              <div className="col-span-1 text-right">
-                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-tertiary-container/10 text-tertiary-container border border-tertiary-container/20">
-                  Delivered
-                </span>
-              </div>
-            </div>
+            ) : (
+              orders.slice(0, 4).map((order, index, arr) => (
+                <div 
+                  key={order.id} 
+                  className={`grid grid-cols-5 px-6 py-5 bg-surface-container-lowest items-center group hover:bg-white transition-colors ${
+                    index === arr.length - 1 ? 'rounded-b-xl' : ''
+                  }`}
+                >
+                  <div className="col-span-1 font-mono text-sm">
+                    #{order.id.slice(0, 8).toUpperCase()}
+                  </div>
+                  <div className="col-span-1 text-sm font-semibold">
+                    {order.buyers?.full_name || "Guest Buyer"}
+                  </div>
+                  <div className="col-span-1 text-sm truncate pr-4 italic" title={getOrderProductText(order)}>
+                    {getOrderProductText(order)}
+                  </div>
+                  <div className="col-span-1 text-sm font-bold text-primary">
+                    ₹ {order.total_amount.toLocaleString()}
+                  </div>
+                  <div className="col-span-1 text-right">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
+                      order.status === "Pending" 
+                        ? "bg-secondary/10 text-secondary border-secondary/20" 
+                        : order.status === "Shipped" 
+                          ? "bg-primary-fixed text-primary border-primary/20" 
+                          : order.status === "Delivered" 
+                            ? "bg-tertiary-container/10 text-tertiary-container border-tertiary-container/20" 
+                            : "bg-error-container/10 text-error border-error/20"
+                    }`}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -260,38 +299,50 @@ const DashboardContent = ({
                   </p>
                 </div>
               </button>
-              <button className="w-full p-4 bg-white rounded-xl flex items-center gap-4 hover:shadow-md hover:translate-y-[-2px] transition-all group">
-                <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
-                  <span
-                    className="material-symbols-outlined"
-                    data-icon="campaign"
-                  >
-                    campaign
-                  </span>
+              <div className="relative group w-full">
+                <button className="w-full p-4 bg-white rounded-xl flex items-center gap-4 hover:shadow-md hover:translate-y-[-2px] transition-all group-hover:shadow-md group-hover:translate-y-[-2px]">
+                  <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
+                    <span
+                      className="material-symbols-outlined"
+                      data-icon="campaign"
+                    >
+                      campaign
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-sm">Create Campaign</p>
+                    <p className="text-[11px] opacity-60">
+                      Boost visibility for new drops
+                    </p>
+                  </div>
+                </button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-neutral-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+                  Coming soon...
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-neutral-900"></div>
                 </div>
-                <div className="text-left">
-                  <p className="font-bold text-sm">Create Campaign</p>
-                  <p className="text-[11px] opacity-60">
-                    Boost visibility for new drops
-                  </p>
+              </div>
+              <div className="relative group w-full">
+                <button className="w-full p-4 bg-white rounded-xl flex items-center gap-4 hover:shadow-md hover:translate-y-[-2px] transition-all group-hover:shadow-md group-hover:translate-y-[-2px]">
+                  <div className="w-10 h-10 rounded-lg bg-outline-variant/20 flex items-center justify-center text-on-surface group-hover:bg-on-surface group-hover:text-white transition-colors">
+                    <span
+                      className="material-symbols-outlined"
+                      data-icon="bar_chart"
+                    >
+                      bar_chart
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-sm">Store Insights</p>
+                    <p className="text-[11px] opacity-60">
+                      Analyze buyer behavior
+                    </p>
+                  </div>
+                </button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-neutral-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+                  Coming soon...
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-neutral-900"></div>
                 </div>
-              </button>
-              <button className="w-full p-4 bg-white rounded-xl flex items-center gap-4 hover:shadow-md hover:translate-y-[-2px] transition-all group">
-                <div className="w-10 h-10 rounded-lg bg-outline-variant/20 flex items-center justify-center text-on-surface group-hover:bg-on-surface group-hover:text-white transition-colors">
-                  <span
-                    className="material-symbols-outlined"
-                    data-icon="bar_chart"
-                  >
-                    bar_chart
-                  </span>
-                </div>
-                <div className="text-left">
-                  <p className="font-bold text-sm">Store Insights</p>
-                  <p className="text-[11px] opacity-60">
-                    Analyze buyer behavior
-                  </p>
-                </div>
-              </button>
+              </div>
             </div>
           </div>
 
@@ -310,15 +361,21 @@ const DashboardContent = ({
               <h5 className="text-white font-bold text-lg leading-tight">
                 Scale your brand with Bazario Prime
               </h5>
-              <button className="mt-3 text-white/90 text-sm font-semibold flex items-center gap-2 hover:gap-4 transition-all">
-                Learn More{" "}
-                <span
-                  className="material-symbols-outlined text-sm"
-                  data-icon="arrow_forward"
-                >
-                  arrow_forward
-                </span>
-              </button>
+              <div className="relative group/prime w-fit">
+                <button className="mt-3 text-white/90 text-sm font-semibold flex items-center gap-2 hover:gap-4 transition-all">
+                  Learn More{" "}
+                  <span
+                    className="material-symbols-outlined text-sm"
+                    data-icon="arrow_forward"
+                  >
+                    arrow_forward
+                  </span>
+                </button>
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-neutral-900 text-white text-xs font-semibold rounded-lg opacity-0 group-hover/prime:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+                  Coming soon...
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-8 border-transparent border-t-neutral-900"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

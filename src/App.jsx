@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
   Link,
+  useLocation,
 } from "react-router-dom";
 import { useAuthStore } from "./stores/authStore";
 import PropTypes from "prop-types";
@@ -40,6 +41,9 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   if (requiredRole && profile?.user_type !== requiredRole) {
+    if (profile?.user_type === "seller") {
+      return <Navigate to="/seller-dashboard" replace />;
+    }
     return <Navigate to="/" replace />;
   }
 
@@ -49,6 +53,19 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   requiredRole: PropTypes.string,
+};
+
+const SellerRedirectGuard = () => {
+  const { profile, isLoading } = useAuthStore();
+  const location = useLocation();
+
+  if (isLoading) return null;
+
+  if (profile?.user_type === "seller" && location.pathname !== "/seller-dashboard") {
+    return <Navigate to="/seller-dashboard" replace />;
+  }
+
+  return null;
 };
 
 const App = () => {
@@ -76,6 +93,7 @@ const App = () => {
 
   return (
     <Router>
+      <SellerRedirectGuard />
       <div className="min-h-screen bg-gray-100">
         {profile?.user_type !== "seller" && (
           <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm">

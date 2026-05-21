@@ -341,7 +341,7 @@ export const orderService = {
   async getSellerOrders(sellerId) {
     const { data, error } = await supabase
       .from('orders')
-      .select('*, order_items(*), buyers(full_name)')
+      .select('*, order_items(*), buyers!buyer_id(full_name)')
       .eq('seller_id', sellerId);
 
     if (error) throw error;

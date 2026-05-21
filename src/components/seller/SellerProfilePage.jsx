@@ -21,7 +21,7 @@ const SellerProfilePage = () => {
       const { data: sellerData, error: sellerError } = await supabase
         .from('sellers')
         .select('*')
-        .eq('id', sellerId)
+        .eq('seller_id', sellerId)
         .single();
 
       // Fetch seller's products
@@ -72,7 +72,7 @@ const SellerProfilePage = () => {
         <div className="max-w-screen-2xl mx-auto px-6 py-16 md:py-24 relative z-10 flex flex-col md:flex-row gap-12 items-center">
           <div className="flex-shrink-0 w-40 h-40 md:w-56 md:h-56 relative rounded-full p-2 bg-gradient-to-br from-primary to-secondary">
             <img 
-              src={seller.profile_image || '/default-avatar.png'} 
+              src={seller.logo_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuBi3Dho0MjP66VJu4kYQ9V0ijWPW9C5s8-p1Ntzj6VJgQGtb4hs7-TASXK2ABMsNn7iK-GLslbFHHFgWLHrscR6rcUkUFr6Y0pXRGlAQdPO6vXUnZsXx3CPSuow23PnWqu7l6kKOYLw6ixDWa03Z9YJ5JvUKw_ybpxxQBnXrdWpvDtvic8xqi4A6Pg-jCqhb8j2r1haIkju6fl6gzEaZAGNvlc6MeBZyDPyUSVI2_H0RRbnRlGCePXfirnuofmvhbd4GzoExZindOk"} 
               alt={seller.store_name} 
               className="w-full h-full rounded-full object-cover border-4 border-surface shadow-2xl"
             />

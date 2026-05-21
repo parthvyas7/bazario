@@ -64,11 +64,6 @@ const StoreSetupContent = ({ onSignOut }) => {
         <div className="max-w-xl w-full">
           <header className="mb-12 flex justify-between items-start">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="px-3 py-1 bg-primary text-on-primary text-[10px] font-bold rounded-full uppercase tracking-tighter">
-                  Storefront Settings
-                </span>
-              </div>
               <h2 className="text-3xl font-plus-jakarta font-extrabold text-primary tracking-tight">
                 Storefront Setup
               </h2>
@@ -149,14 +144,13 @@ const StoreSetupContent = ({ onSignOut }) => {
 
               <div className="col-span-2 md:col-span-1 flex flex-col justify-center p-6 bg-primary-container/10 rounded-xl">
                 <span className="material-symbols-outlined text-primary mb-3">
-                  lightbulb
+                  storefront
                 </span>
                 <h4 className="font-plus-jakarta font-bold text-primary text-sm mb-1">
-                  Curation Tip
+                  Brand Identity
                 </h4>
                 <p className="text-xs text-on-primary-fixed-variant leading-relaxed">
-                  A clean, minimalist logo increases customer trust by up to
-                  40%. Avoid busy patterns.
+                  Your store name, logo, and story represent your brand to all customers on Bazario. Authentic and recognizable branding helps drive customer loyalty and repeat visits.
                 </p>
               </div>
 
@@ -180,7 +174,7 @@ const StoreSetupContent = ({ onSignOut }) => {
                 type="submit"
                 disabled={saveStatus === 'saving'}
               >
-                {saveStatus === 'saving' ? 'Saving...' : 'Save & Continue'}
+                {saveStatus === 'saving' ? 'Saving...' : 'Save'}
               </button>
               <button
                 className="w-full md:w-auto px-10 py-4 text-primary font-plus-jakarta font-bold text-sm hover:bg-surface-container-low rounded-full transition-colors"

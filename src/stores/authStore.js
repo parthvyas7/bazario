@@ -14,7 +14,7 @@ export const useAuthStore = create((set) => ({
       const user = await authService.getCurrentUser();
       if (user) {
         // Fetch profile data if needed
-        const profile = await authService.getProfile(user.id);
+        const profile = await authService.getProfile(user.seller_id || user.id);
         set({ user, profile, isLoading: false, isInitialized: true });
       } else {
         set({ user: null, profile: null, isLoading: false, isInitialized: true });
