@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import supabase from "../../utils/supabase";
+import { formatPrice } from "../../utils/services";
 
 const BuyerOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -138,7 +139,7 @@ const BuyerOrders = () => {
                         )}
                       </div>
                     <div className="text-right">
-                      <p className="font-bold font-headline text-on-surface"><span className="text-secondary">₹</span>{order.total_amount.toFixed(2)}</p>
+                      <p className="font-bold font-headline text-on-surface"><span className="text-secondary">₹</span>{formatPrice(order.total_amount)}</p>
                       <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded leading-none inline-block mt-1
                         ${order.status === "Pending" ? "bg-secondary-fixed text-on-secondary-fixed" : 
                           order.status === "Shipped" ? "bg-tertiary-container/10 text-tertiary-container" : 
@@ -162,7 +163,7 @@ const BuyerOrders = () => {
                         </div>
                         <div className="flex-1">
                           <p className="font-bold text-sm text-on-surface line-clamp-1">{item.products.title}</p>
-                          <p className="text-xs text-on-surface-variant">Qty: {item.quantity} • ₹{item.price_at_purchase.toFixed(2)} each</p>
+                          <p className="text-xs text-on-surface-variant">Qty: {item.quantity} • ₹{formatPrice(item.price_at_purchase)} each</p>
                         </div>
                       </div>
                     ))}
@@ -289,7 +290,7 @@ const BuyerOrders = () => {
             </div>
 
             <div className="pt-6 border-t border-outline-variant/10">
-              <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Curated Items</h4>
+              <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Ordered Items</h4>
               <div className="space-y-4">
                 {selectedOrder.order_items.map((item) => (
                   <div key={item.id} className="flex gap-4 items-center">
@@ -303,10 +304,10 @@ const BuyerOrders = () => {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-sm text-on-surface truncate">{item.products?.name}</p>
                       <p className="text-xs text-on-surface-variant">{item.products?.category}</p>
-                      <p className="text-xs text-on-surface-variant mt-0.5">Qty: {item.quantity} • ₹{item.price_at_purchase.toFixed(2)} each</p>
+                      <p className="text-xs text-on-surface-variant mt-0.5">Qty: {item.quantity} • ₹{formatPrice(item.price_at_purchase)} each</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-sm text-on-surface">₹{(item.quantity * item.price_at_purchase).toFixed(2)}</p>
+                      <p className="font-bold text-sm text-on-surface">₹{formatPrice(item.quantity * item.price_at_purchase)}</p>
                     </div>
                   </div>
                 ))}
@@ -316,7 +317,7 @@ const BuyerOrders = () => {
             <div className="pt-6 border-t border-outline-variant/10 flex justify-between items-center">
               <div>
                 <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Grand Total</p>
-                <p className="text-2xl font-headline font-black text-secondary">₹{selectedOrder.total_amount.toFixed(2)}</p>
+                <p className="text-2xl font-headline font-black text-secondary">₹{formatPrice(selectedOrder.total_amount)}</p>
               </div>
               <button 
                 onClick={() => setSelectedOrder(null)}

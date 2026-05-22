@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import supabase from '../utils/supabase';
 import { useCartStore } from '../stores/cartStore';
 import { useWishlistStore } from '../stores/wishlistStore';
+import { formatPrice } from '../utils/services';
 
 const BuyerHome = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -86,7 +87,7 @@ const BuyerHome = () => {
       price: fallbackPrice,
       category: fallbackCategory,
       image_url: fallbackImg,
-      description: 'Handcrafted premium curation'
+      description: 'Handcrafted premium design'
     };
   };
 
@@ -116,7 +117,7 @@ const BuyerHome = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/40 to-transparent"></div>
             </div>
             <div className="relative z-10 max-w-2xl pl-12 text-white">
-              <span className="font-headline font-bold uppercase tracking-widest text-secondary mb-4 block">The Indian Curator</span>
+              <span className="font-headline font-bold uppercase tracking-widest text-secondary mb-4 block">The Indian Merchant</span>
               <h1 className="text-6xl font-headline font-extrabold tracking-tight mb-6 leading-tight">Authentic Indian Craftsmanship, Reimagined.</h1>
               <p className="text-xl text-primary-fixed leading-relaxed mb-8 font-body">From artisanal home decor to cutting-edge electronics, discover the best of Bharat’s creative landscape.</p>
               <Link to="/products" className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold shadow-lg hover:scale-105 transition-transform inline-block">Explore the Collection</Link>
@@ -180,7 +181,7 @@ const BuyerHome = () => {
                 <div className="flex items-baseline gap-1">
                   <span className="text-secondary font-headline font-bold">₹</span>
                   <span className="text-2xl font-headline font-extrabold text-white">
-                    {Number(p0.price).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                    {formatPrice(p0.price)}
                   </span>
                 </div>
               </div>
@@ -212,7 +213,7 @@ const BuyerHome = () => {
               <div className="absolute bottom-4 left-4 right-4 z-10">
                 <span className="text-secondary font-headline font-bold text-[10px] uppercase tracking-wider block">{p1.category || 'HOME'}</span>
                 <Link to={p1.id === 'placeholder' ? '/products' : `/product/${p1.id}`} className="text-white font-headline font-bold line-clamp-1 hover:underline mb-1">{p1.name}</Link>
-                <span className="text-white/95 font-bold text-sm">₹{Number(p1.price).toLocaleString('en-IN')}</span>
+                <span className="text-white/95 font-bold text-sm">₹{formatPrice(p1.price)}</span>
               </div>
             </div>
 
@@ -242,7 +243,7 @@ const BuyerHome = () => {
               <div className="absolute bottom-4 left-4 right-4 z-10">
                 <span className="text-secondary font-headline font-bold text-[10px] uppercase tracking-wider block">{p2.category || 'HOME'}</span>
                 <Link to={p2.id === 'placeholder' ? '/products' : `/product/${p2.id}`} className="text-white font-headline font-bold line-clamp-1 hover:underline mb-1">{p2.name}</Link>
-                <span className="text-white/95 font-bold text-sm">₹{Number(p2.price).toLocaleString('en-IN')}</span>
+                <span className="text-white/95 font-bold text-sm">₹{formatPrice(p2.price)}</span>
               </div>
             </div>
 
@@ -275,7 +276,7 @@ const BuyerHome = () => {
                   <Link to={p3.id === 'placeholder' ? '/products' : `/product/${p3.id}`} className="text-white text-2xl font-headline font-bold hover:underline block line-clamp-1">{p3.name}</Link>
                 </div>
                 <div className="text-white font-headline font-bold text-lg whitespace-nowrap bg-black/40 backdrop-blur-xs px-4 py-2 rounded-xl border border-white/10">
-                  ₹{Number(p3.price).toLocaleString('en-IN')}
+                  ₹{formatPrice(p3.price)}
                 </div>
               </div>
             </div>
@@ -288,7 +289,7 @@ const BuyerHome = () => {
             <div className="flex justify-between items-end mb-12">
               <div>
                 <h2 className="text-4xl font-headline font-extrabold tracking-tight text-primary">Featured Selection</h2>
-                <p className="text-on-surface-variant font-body mt-2">Curated by our editors for exceptional quality and design.</p>
+                <p className="text-on-surface-variant font-body mt-2">Selected for exceptional quality and design.</p>
               </div>
               <Link to="/products" className="flex items-center gap-2 text-primary font-bold hover:text-secondary group transition-colors">
                 View All <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -343,7 +344,7 @@ const BuyerHome = () => {
                         <div className="flex items-baseline gap-1">
                           <span className="text-secondary font-headline font-bold">₹</span>
                           <span className="text-xl font-headline font-extrabold text-on-surface">
-                            {Number(product.price).toLocaleString('en-IN')}
+                            {formatPrice(product.price)}
                           </span>
                         </div>
                         {(() => {
@@ -414,7 +415,7 @@ const BuyerHome = () => {
                 Bazario
               </Link>
               <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
-                Curating authentic Indian craftsmanship and premium design. We connect you with verified independent local creators across Bharat.
+                Showcasing authentic Indian craftsmanship and premium design. We connect you with verified independent local creators across Bharat.
               </p>
               {/* Social icons */}
               <div className="flex gap-4">
@@ -523,7 +524,7 @@ const BuyerHome = () => {
           <div className="border-t border-b border-slate-800/80 py-12 mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="max-w-md">
               <h4 className="text-white font-headline font-bold text-lg mb-1">Subscribe to our newsletter</h4>
-              <p className="text-sm text-slate-400">Receive curated designer collections, stories behind craft, and exclusive early access.</p>
+              <p className="text-sm text-slate-400">Receive handpicked designer collections, stories behind craft, and exclusive early access.</p>
             </div>
             
             <form onSubmit={handleNewsletterSubmit} className="w-full md:w-auto flex flex-col sm:flex-row gap-3">
@@ -541,7 +542,7 @@ const BuyerHome = () => {
                 type="submit"
                 className="px-6 py-3.5 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 active:scale-98 transition-all text-sm whitespace-nowrap shadow-sm"
               >
-                Join Curation
+                Subscribe
               </button>
             </form>
           </div>
@@ -550,7 +551,7 @@ const BuyerHome = () => {
           {newsletterSubscribed && (
             <div className="mb-8 p-4 bg-secondary/10 border border-secondary/20 rounded-xl flex items-center gap-3 text-secondary text-sm animate-fade-in">
               <span className="material-symbols-outlined">celebration</span>
-              <span>Thank you! You have successfully subscribed to the Bazario curation newsletter.</span>
+              <span>Thank you! You have successfully subscribed to the Bazario newsletter.</span>
             </div>
           )}
 

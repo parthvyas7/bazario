@@ -196,7 +196,7 @@ const AddProductContent = ({ newProduct, setNewProduct, handleAddProduct, editin
           <h1 className="text-4xl font-headline font-extrabold text-primary tracking-tighter">
             {editingProduct ? "Edit Product" : "Add New Product"}
           </h1>
-          <p className="text-on-surface-variant mt-2 font-body text-sm">Create a high-impact listing for your curated collection.</p>
+          <p className="text-on-surface-variant mt-2 font-body text-sm">Create a high-impact listing for your store catalog.</p>
         </div>
         <div className="flex gap-4">
           <button 

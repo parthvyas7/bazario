@@ -1,6 +1,7 @@
 import { useCartStore } from "../../stores/cartStore";
 import { useAuthStore } from "../../stores/authStore";
 import { Link, useNavigate } from "react-router-dom";
+import { formatPrice } from "../../utils/services";
 
 const ShoppingCart = () => {
   const { cart, removeFromCart, updateQuantity } = useCartStore();
@@ -8,9 +9,7 @@ const ShoppingCart = () => {
   const navigate = useNavigate();
 
   const calculateTotal = () => {
-    return cart
-      .reduce((total, item) => total + item.price * item.quantity, 0)
-      .toFixed(2);
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const handleCheckout = () => {
@@ -29,8 +28,8 @@ const ShoppingCart = () => {
         {/* Left Column: Cart Items */}
         <div className="lg:col-span-7 space-y-8">
           <header>
-            <h1 className="text-3xl font-extrabold font-headline tracking-tighter text-primary">Your Curator Selection</h1>
-            <p className="text-on-surface-variant font-medium mt-1">Review your items before final curation.</p>
+            <h1 className="text-3xl font-extrabold font-headline tracking-tighter text-primary">Your Seller Selection</h1>
+            <p className="text-on-surface-variant font-medium mt-1">Review your items before final purchase.</p>
           </header>
 
           {cart.length === 0 ? (
@@ -87,7 +86,7 @@ const ShoppingCart = () => {
                       </div>
                       <div className="text-right">
                         <span className="text-secondary font-headline font-bold">₹</span>
-                        <span className="text-on-surface font-headline font-bold text-xl ml-1">{item.price.toFixed(2)}</span>
+                        <span className="text-on-surface font-headline font-bold text-xl ml-1">{formatPrice(item.price)}</span>
                       </div>
                     </div>
                   </div>
@@ -107,14 +106,14 @@ const ShoppingCart = () => {
               <div className="space-y-4 relative z-10">
                 <div className="flex justify-between items-center text-on-primary-container">
                   <span className="font-medium">Subtotal</span>
-                  <span className="font-headline font-bold">₹{calculateTotal()}</span>
+                  <span className="font-headline font-bold">₹{formatPrice(calculateTotal())}</span>
                 </div>
                 {/* Simplified view for cart before shipping is calculated */}
                 <div className="h-px bg-white/10 my-4"></div>
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-xs font-bold text-on-primary-container uppercase tracking-widest">Estimated Total</p>
-                    <p className="text-3xl font-headline font-extrabold tracking-tight">₹{calculateTotal()}</p>
+                    <p className="text-3xl font-headline font-extrabold tracking-tight">₹{formatPrice(calculateTotal())}</p>
                   </div>
                   <span className="bg-secondary px-3 py-1 rounded text-[10px] font-black uppercase mb-1">Secure SSL</span>
                 </div>

@@ -3,6 +3,7 @@ import supabase from '../../utils/supabase';
 import { useCartStore } from '../../stores/cartStore';
 import { useWishlistStore } from '../../stores/wishlistStore';
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { formatPrice } from '../../utils/services';
 
 const ProductListing = () => {
   const [products, setProducts] = useState([]);
@@ -151,7 +152,7 @@ const ProductListing = () => {
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-4xl font-headline font-black text-primary tracking-tight">Browse Products</h1>
-            <p className="text-on-surface-variant font-body mt-2">Discover curated goods from independent Indian sellers.</p>
+            <p className="text-on-surface-variant font-body mt-2">Discover premium goods from independent Indian sellers.</p>
           </div>
           <div className="text-sm font-semibold text-on-surface-variant">
             Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
@@ -361,7 +362,7 @@ const ProductListing = () => {
                         <div className="flex items-baseline gap-1">
                           <span className="text-secondary font-headline font-bold">₹</span>
                           <span className="text-2xl font-headline font-extrabold text-on-surface">
-                            {Number(product.price).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                            {formatPrice(product.price)}
                           </span>
                         </div>
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { formatPrice } from "../../utils/services";
 
 const DashboardContent = ({
   totalSales,
@@ -67,7 +68,7 @@ const DashboardContent = ({
               Overview
             </h3>
             <p className="text-on-surface-variant mt-2">
-              Welcome back to your curation space. Here is your store's pulse
+              Welcome back to your management space. Here is your store's pulse
               today.
             </p>
           </div>
@@ -110,7 +111,7 @@ const DashboardContent = ({
             Total Sales
           </p>
           <h4 className="text-3xl font-black text-primary">
-            ₹{totalSales.toFixed(2)}
+            ₹{formatPrice(totalSales)}
           </h4>
           <div className={`mt-4 flex items-center gap-2 text-xs font-bold ${salesTrendColorClass} w-fit px-2 py-1 rounded`}>
             <span
@@ -253,7 +254,7 @@ const DashboardContent = ({
                     {getOrderProductText(order)}
                   </div>
                   <div className="col-span-1 text-sm font-bold text-primary">
-                    ₹ {order.total_amount.toLocaleString()}
+                    ₹{formatPrice(order.total_amount)}
                   </div>
                   <div className="col-span-1 text-right">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${
@@ -295,7 +296,7 @@ const DashboardContent = ({
                 <div className="text-left">
                   <p className="font-bold text-sm">Add New Product</p>
                   <p className="text-[11px] opacity-60">
-                    Expand your curated list
+                    Expand your product catalog
                   </p>
                 </div>
               </button>

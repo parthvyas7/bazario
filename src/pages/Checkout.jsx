@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
-import { orderService, authService } from "../utils/services";
+import { orderService, authService, formatPrice } from "../utils/services";
 
 const Checkout = () => {
   const { cart, removeFromCart, totalAmount, clearCart } = useCartStore();
@@ -56,41 +56,22 @@ const Checkout = () => {
   const shippingCost = 450;
   const grandTotal = calculateSubtotal() + gstValue + shippingCost;
 
-  const handleSubmitOrder = async () => {
+  const handleSubmitOrder = () => {
     if (!shippingInfo.fullName || !shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode || !shippingInfo.phone) {
       alert("Please fill in all shipping details");
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const orderData = {
-        userId: user.id,
-        items: cart,
-        totalAmount: grandTotal,
-        shippingInfo,
-        status: 'Pending',
-        paymentMethod
-      };
-      
-      await orderService.createOrder(orderData);
-      
-      if (user && profile && profile.user_type === 'buyer') {
-        try {
-          await authService.updateBuyerProfile(user.id, { address_details: shippingInfo });
-        } catch (err) {
-          console.error("Failed to save address details to profile", err);
-        }
-      }
+    const orderData = {
+      userId: user.id,
+      items: cart,
+      totalAmount: grandTotal,
+      shippingInfo,
+      status: 'Pending',
+      paymentMethod
+    };
 
-      clearCart();
-      navigate('/order-confirmation');
-    } catch (error) {
-      console.error('Error creating order:', error);
-      alert('Failed to place order. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    navigate('/payment', { state: { orderData } });
   };
 
   return (
@@ -99,8 +80,8 @@ const Checkout = () => {
         {/* Left Column: Cart Items & Shipping */}
         <div className="lg:col-span-7 space-y-8">
           <header>
-            <h1 className="text-3xl font-extrabold font-headline tracking-tighter text-primary">Your Curator Selection</h1>
-            <p className="text-on-surface-variant font-medium mt-1">Review your items before final curation.</p>
+            <h1 className="text-3xl font-extrabold font-headline tracking-tighter text-primary">Your Seller Selection</h1>
+            <p className="text-on-surface-variant font-medium mt-1">Review your items before final purchase.</p>
           </header>
 
           <div className="space-y-4">
@@ -132,7 +113,7 @@ const Checkout = () => {
                     </div>
                     <div className="text-right">
                       <span className="text-secondary font-headline font-bold">₹</span>
-                      <span className="text-on-surface font-headline font-bold text-xl ml-1">{item.price.toFixed(2)}</span>
+                      <span className="text-on-surface font-headline font-bold text-xl ml-1">{formatPrice(item.price)}</span>
                     </div>
                   </div>
                 </div>
@@ -263,21 +244,21 @@ const Checkout = () => {
               <div className="space-y-4 relative z-10">
                 <div className="flex justify-between items-center text-on-primary-container">
                   <span className="font-medium">Subtotal</span>
-                  <span className="font-headline font-bold">₹{calculateSubtotal().toFixed(2)}</span>
+                  <span className="font-headline font-bold">₹{formatPrice(calculateSubtotal())}</span>
                 </div>
                 <div className="flex justify-between items-center text-on-primary-container">
-                  <span className="font-medium">Curator Shipping</span>
-                  <span className="font-headline font-bold">₹{shippingCost.toFixed(2)}</span>
+                  <span className="font-medium">Seller Shipping</span>
+                  <span className="font-headline font-bold">₹{formatPrice(shippingCost)}</span>
                 </div>
                 <div className="flex justify-between items-center text-on-primary-container">
                   <span className="font-medium">GST (18%)</span>
-                  <span className="font-headline font-bold">₹{gstValue.toFixed(2)}</span>
+                  <span className="font-headline font-bold">₹{formatPrice(gstValue)}</span>
                 </div>
                 <div className="h-px bg-white/10 my-4"></div>
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-xs font-bold text-on-primary-container uppercase tracking-widest">Total Amount</p>
-                    <p className="text-3xl font-headline font-extrabold tracking-tight">₹{grandTotal.toFixed(2)}</p>
+                    <p className="text-3xl font-headline font-extrabold tracking-tight">₹{formatPrice(grandTotal)}</p>
                   </div>
                   <span className="bg-secondary px-3 py-1 rounded text-[10px] font-black uppercase mb-1">Secure SSL</span>
                 </div>
@@ -285,14 +266,14 @@ const Checkout = () => {
               
               <button 
                 onClick={handleSubmitOrder}
-                disabled={isSubmitting || cart.length === 0}
+                disabled={cart.length === 0}
                 className="w-full mt-10 py-4 bg-gradient-to-r from-secondary to-secondary-container text-white font-headline font-bold text-lg rounded-full transition-transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-secondary/20 flex justify-center items-center gap-2 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none"
               >
-                {isSubmitting ? 'Processing...' : 'Complete Purchase'}
+                Proceed to Payment
               </button>
               
               <p className="text-center text-[10px] text-on-primary-container mt-6 opacity-60">
-                By clicking complete, you agree to Bazario's Terms of Curation and Shipping Policies.
+                By clicking complete, you agree to Bazario's Terms of Purchase and Shipping Policies.
               </p>
             </div>
 

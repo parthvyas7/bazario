@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import supabase from '../../utils/supabase';
 import { useCartStore } from '../../stores/cartStore';
+import { formatPrice } from '../../utils/services';
 
 const SellerProfilePage = () => {
   const [seller, setSeller] = useState(null);
@@ -42,14 +43,6 @@ const SellerProfilePage = () => {
     }
   };
 
-  const formatPrice = (price) => {
-    const priceNum = Number(price);
-    if (isNaN(priceNum)) return '0';
-    return priceNum % 1 === 0
-      ? priceNum.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-      : priceNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
   if (loading) {
     return (
       <div className="pt-24 pb-12 px-6 max-w-screen-2xl mx-auto min-h-[70vh]">
@@ -64,7 +57,7 @@ const SellerProfilePage = () => {
         <div className="text-center">
           <span className="material-symbols-outlined text-outline-variant text-6xl mb-4">store_off</span>
           <h2 className="text-2xl font-bold font-headline text-primary mb-2">Store Not Found</h2>
-          <p className="text-on-surface-variant">The curator you are looking for does not exist or has closed their shop.</p>
+          <p className="text-on-surface-variant">The seller you are looking for does not exist or has closed their shop.</p>
         </div>
       </div>
     );
@@ -96,7 +89,7 @@ const SellerProfilePage = () => {
               {seller.store_name || "Untitled Store"}
             </h1>
             <p className="text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto md:mx-0">
-              {seller.bio || "A curator of fine goods and aesthetic collections."}
+              {seller.bio || "A merchant of fine goods and aesthetic collections."}
             </p>
             
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 pt-4">
@@ -120,7 +113,7 @@ const SellerProfilePage = () => {
         <div className="flex items-end justify-between border-b border-surface-container-highest pb-6 mb-12">
           <div>
             <p className="text-xs font-headline font-bold uppercase tracking-widest text-primary/40 mb-1">The Gallery</p>
-            <h2 className="text-3xl font-headline font-bold text-primary">Curated Collection</h2>
+            <h2 className="text-3xl font-headline font-bold text-primary">Store Collection</h2>
           </div>
           <p className="text-sm font-bold text-on-surface-variant hidden md:block">{products.length} Items Available</p>
         </div>
@@ -129,7 +122,7 @@ const SellerProfilePage = () => {
           <div className="text-center py-20 bg-surface-container-lowest rounded-3xl border border-outline-variant/10">
             <span className="material-symbols-outlined text-6xl text-outline-variant/50 mb-4">inventory_2</span>
             <h3 className="text-xl font-bold font-headline text-on-surface mb-2">The Gallery is Empty</h3>
-            <p className="text-on-surface-variant max-w-md mx-auto">This curator hasn't added any products to their collection yet. Check back soon for new arrivals.</p>
+            <p className="text-on-surface-variant max-w-md mx-auto">This seller hasn't added any products to their collection yet. Check back soon for new arrivals.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

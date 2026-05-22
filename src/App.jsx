@@ -27,6 +27,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import BuyerHome from "./pages/BuyerHome";
+import Payment from "./pages/Payment";
+import { formatPrice } from "./utils/services";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, profile, isLoading } = useAuthStore();
@@ -216,7 +218,7 @@ const Navbar = ({ profile, user, handleSignOut, cart }) => {
                         </span>
                       </div>
                       <span className="text-sm font-bold text-secondary flex-shrink-0">
-                        ₹{Number(item.price).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                        ₹{formatPrice(item.price)}
                       </span>
                     </button>
                   ))}
@@ -254,7 +256,7 @@ const Navbar = ({ profile, user, handleSignOut, cart }) => {
               )}
               <div className="flex items-center gap-4 ml-4">
                 <span className="text-sm font-medium text-on-surface-variant truncate max-w-[150px]">
-                  {profile?.store_name || profile?.full_name || user.email}
+                  {profile?.store_name || user?.user_metadata?.name || user?.user_metadata?.full_name || profile?.full_name || user?.email}
                 </span>
                 <button
                   onClick={handleSignOut}
@@ -410,6 +412,14 @@ const App = () => {
               element={
                 <ProtectedRoute requiredRole="buyer">
                   <Checkout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment"
+              element={
+                <ProtectedRoute requiredRole="buyer">
+                  <Payment />
                 </ProtectedRoute>
               }
             />

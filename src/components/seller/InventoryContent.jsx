@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatPrice } from '../../utils/services';
 
 const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -68,7 +69,7 @@ const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
             Product Inventory
           </h2>
           <p className="text-on-surface-variant font-medium mt-1">
-            Manage your curated collection and stock levels.
+            Manage your product collection and stock levels.
           </p>
         </div>
         <div className="flex gap-4">
@@ -214,7 +215,7 @@ const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
                 Inventory Value
               </p>
               <h3 className="font-headline text-4xl font-extrabold text-white tracking-tighter">
-                ₹ {formattedValue}
+                ₹{formatPrice(totalInventoryValue)}
               </h3>
             </div>
             <p className="text-primary-fixed text-sm opacity-80 mt-4">
@@ -283,7 +284,7 @@ const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
               <div className="col-span-2">
                 <p className="font-headline font-bold text-on-surface text-lg">
                   <span className="text-secondary mr-1">₹</span>
-                  {typeof product.price === 'number' ? product.price.toLocaleString('en-IN', { minimumFractionDigits: 2 }) : parseFloat(product.price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  {formatPrice(product.price)}
                 </p>
               </div>
               <div className="col-span-2 flex flex-col items-center">
@@ -329,7 +330,7 @@ const InventoryContent = ({ products, onStartEdit, onDeleteProduct }) => {
 
       <footer className="mt-12 pt-8 border-t border-surface-variant flex items-center justify-between">
         <p className="text-on-surface-variant text-xs">
-          Showing {filteredProducts.length > 0 ? startIndex + 1 : 0} - {Math.min(startIndex + ITEMS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} curated listings
+          Showing {filteredProducts.length > 0 ? startIndex + 1 : 0} - {Math.min(startIndex + ITEMS_PER_PAGE, filteredProducts.length)} of {filteredProducts.length} product listings
         </p>
         <div className="flex gap-2">
           {currentPage > 1 && (

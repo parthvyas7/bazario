@@ -1,5 +1,14 @@
 import supabase from "./supabase";
 
+// Price Formatting Utility
+export const formatPrice = (price) => {
+  const priceNum = Number(price);
+  if (isNaN(priceNum)) return '0';
+  return priceNum % 1 === 0
+    ? priceNum.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+    : priceNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
 // Authentication Service
 export const authService = {
   async signUp(email, password, role, additionalData) {
@@ -102,7 +111,7 @@ export const authService = {
               .from('buyers')
               .insert({
                 id: user.id,
-                full_name: meta.username || meta.full_name || '',
+                full_name: meta.name || meta.full_name || meta.username || '',
                 email: user.email,
                 role: 'seller'
               });
@@ -145,7 +154,7 @@ export const authService = {
             .from('buyers')
             .insert({
               id: user.id,
-              full_name: meta.username || meta.full_name || '',
+              full_name: meta.name || meta.full_name || meta.username || '',
               email: user.email,
               role: 'buyer'
             })

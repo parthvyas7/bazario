@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import supabase from '../../utils/supabase';
-
 import { useAuthStore } from '../../stores/authStore';
+import { formatPrice } from '../../utils/services';
 
 import SellerSidebar from './SellerSidebar';
 import SellerMobileNav from './SellerMobileNav';
@@ -275,7 +275,7 @@ const SellerDashboard = () => {
                          >
                            {order.status}
                          </span>
-                         <p className="font-bold text-lg text-primary">₹{order.total_amount.toLocaleString()}</p>
+                         <p className="font-bold text-lg text-primary">₹{formatPrice(order.total_amount)}</p>
                        </div>
                      </div>
 
@@ -294,7 +294,7 @@ const SellerDashboard = () => {
                            <div className="flex-1 min-w-0">
                              <p className="text-sm font-bold text-on-surface truncate">{item.products?.name || "Deleted Product"}</p>
                              <p className="text-xs text-on-surface-variant font-semibold">
-                               Qty: {item.quantity} • ₹{parseFloat(item.price_at_purchase || item.products?.price || 0).toLocaleString()}
+                               Qty: {item.quantity} • ₹{formatPrice(item.price_at_purchase || item.products?.price || 0)}
                              </p>
                            </div>
                          </div>

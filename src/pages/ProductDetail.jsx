@@ -6,6 +6,7 @@ import { ProductReviews } from '../components/buyer/ProductReviews';
 import { SellerInfo } from '../components/buyer/SellerInfo';
 import { RelatedProducts } from '../components/buyer/RelatedProducts';
 import supabase from '../utils/supabase';
+import { formatPrice } from '../utils/services';
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -230,13 +231,7 @@ const ProductDetail = () => {
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="text-3xl font-headline font-bold text-secondary">₹</span>
                 <span className="text-5xl font-headline font-black text-on-surface tracking-tighter">
-                  {(() => {
-                    const priceNum = Number(currentProduct.price);
-                    if (isNaN(priceNum)) return '0';
-                    return priceNum % 1 === 0
-                      ? priceNum.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                      : priceNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                  })()}
+                    {formatPrice(currentProduct.price)}
                 </span>
               </div>
               
@@ -351,7 +346,7 @@ const ProductDetail = () => {
             <div className="space-y-6">
               <h4 className="text-xl font-bold text-primary">Quality Assurance</h4>
               <p className="text-on-surface-variant leading-relaxed">
-                Every item is rigorously inspected to ensure quality and authenticity. Bazario&apos;s curated collection maintains the highest standards of craftsmanship.
+                Every item is rigorously inspected to ensure quality and authenticity. Bazario&apos;s product catalog maintains the highest standards of craftsmanship.
               </p>
               <div className="flex gap-4 items-center">
                 <span className="material-symbols-outlined text-secondary">verified</span>

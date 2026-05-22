@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import supabase from "../../utils/supabase";
+import { formatPrice } from "../../utils/services";
 
 export const RelatedProducts = ({ categoryId, currentProductId }) => {
   const [products, setProducts] = useState([]);
@@ -61,7 +62,7 @@ export const RelatedProducts = ({ categoryId, currentProductId }) => {
             <h3 className="font-bold text-primary group-hover:text-secondary transition-colors line-clamp-1">{product.name}</h3>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-secondary font-bold">₹</span>
-              <span className="text-on-surface font-bold">{Number(product.price).toFixed(2)}</span>
+              <span className="text-on-surface font-bold">{formatPrice(product.price)}</span>
             </div>
           </Link>
         ))}
