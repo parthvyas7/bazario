@@ -8,16 +8,41 @@ export const useCartStore = create((set, get) => ({
   error: null,
   
   fetchCart: async (userId) => {
-    if (!userId) return;
+    if (!userId) {
+      try {
+        const guestCart = JSON.parse(localStorage.getItem('bazario_guest_cart')) || [];
+        set({ cart: guestCart, isLoading: false });
+      } catch (err) {
+        console.error("Failed to load guest cart:", err);
+        set({ cart: [], isLoading: false });
+      }
+      return;
+    }
     set({ isLoading: true });
     try {
+      // Merge guest cart items if any exist
+      const guestCartStr = localStorage.getItem('bazario_guest_cart');
+      if (guestCartStr) {
+        try {
+          const guestCart = JSON.parse(guestCartStr) || [];
+          if (guestCart.length > 0) {
+            for (const item of guestCart) {
+              await cartService.addToCart(userId, item.product_id, item.quantity);
+            }
+            localStorage.removeItem('bazario_guest_cart');
+          }
+        } catch (mergeErr) {
+          console.error("Failed to merge guest cart items:", mergeErr);
+        }
+      }
+
       const cartItems = await cartService.getUserCart(userId);
       const mappedItems = cartItems.map(item => ({
         id: item.id,
         buyer_id: item.buyer_id,
         product_id: item.product_id,
         quantity: item.quantity,
-        name: item.products?.title || '',
+        name: item.products?.title || item.products?.name || '',
         price: Number(item.products?.price) || 0,
         description: item.products?.description || '',
         image_url: item.products?.image_url || '',
@@ -33,7 +58,28 @@ export const useCartStore = create((set, get) => ({
   addToCart: async (product, quantity = 1) => {
     const user = useAuthStore.getState().user;
     if (!user) {
-      console.warn("User not logged in, cannot add to cart");
+      const currentCart = [...get().cart];
+      const existingItemIndex = currentCart.findIndex(item => item.product_id === product.id);
+      
+      if (existingItemIndex > -1) {
+        currentCart[existingItemIndex].quantity += quantity;
+      } else {
+        currentCart.push({
+          id: `guest_${product.id}_${Date.now()}`,
+          buyer_id: null,
+          product_id: product.id,
+          quantity: quantity,
+          name: product.title || product.name || '',
+          price: Number(product.price) || 0,
+          description: product.description || '',
+          image_url: product.image_url || '',
+          seller_id: product.seller_id || '',
+          products: product
+        });
+      }
+      
+      localStorage.setItem('bazario_guest_cart', JSON.stringify(currentCart));
+      set({ cart: currentCart });
       return;
     }
     set({ isLoading: true });
@@ -47,7 +93,12 @@ export const useCartStore = create((set, get) => ({
   
   removeFromCart: async (itemId) => {
     const user = useAuthStore.getState().user;
-    if (!user) return;
+    if (!user) {
+      const currentCart = get().cart.filter(item => item.id !== itemId);
+      localStorage.setItem('bazario_guest_cart', JSON.stringify(currentCart));
+      set({ cart: currentCart });
+      return;
+    }
     set({ isLoading: true });
     try {
       await cartService.removeFromCart(itemId);
@@ -57,7 +108,10 @@ export const useCartStore = create((set, get) => ({
     }
   },
   
-  clearCart: () => set({ cart: [] }),
+  clearCart: () => {
+    localStorage.removeItem('bazario_guest_cart');
+    set({ cart: [] });
+  },
   
   calculateTotal: () => {
     return get().cart.reduce((total, item) => {

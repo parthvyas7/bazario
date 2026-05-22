@@ -1,8 +1,10 @@
 import { useCartStore } from "../../stores/cartStore";
+import { useAuthStore } from "../../stores/authStore";
 import { Link, useNavigate } from "react-router-dom";
 
 const ShoppingCart = () => {
   const { cart, removeFromCart } = useCartStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
 
   const calculateTotal = () => {
@@ -13,7 +15,11 @@ const ShoppingCart = () => {
 
   const handleCheckout = () => {
     if (cart.length > 0) {
-      navigate("/checkout");
+      if (!user) {
+        navigate("/login?redirect=/cart");
+      } else {
+        navigate("/checkout");
+      }
     }
   };
 

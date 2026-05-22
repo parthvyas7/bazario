@@ -48,7 +48,7 @@ export const SellerInfo = ({ sellerId }) => {
       
       <div className="mt-6 flex justify-between items-center relative z-10">
         <Link
-          to={`/seller/${seller.id}`}
+          to={`/seller/${seller.seller_id}`}
           className="text-primary font-bold text-sm underline underline-offset-4 decoration-secondary hover:text-secondary transition-colors"
         >
           View Store Collection

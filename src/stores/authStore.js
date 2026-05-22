@@ -63,6 +63,12 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true });
     try {
       await authService.signOut();
+      try {
+        const { useCartStore } = await import('./cartStore');
+        useCartStore.getState().clearCart();
+      } catch (cartErr) {
+        console.error('Error clearing cart on sign out:', cartErr);
+      }
       set({ user: null, profile: null, isLoading: false });
       return true;
     } catch (error) {

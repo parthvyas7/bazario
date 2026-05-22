@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 
 const LoginForm = () => {
@@ -8,16 +8,20 @@ const LoginForm = () => {
   const [loginRole, setLoginRole] = useState('buyer');
   const { signIn, user, profile, error, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const query = new URLSearchParams(location.search);
+  const redirectTo = query.get('redirect') || location.state?.from?.pathname || '/';
 
   useEffect(() => {
     if (user) {
       if (profile?.user_type === 'seller') {
         navigate('/seller-dashboard', { replace: true });
       } else {
-        navigate('/', { replace: true });
+        navigate(redirectTo, { replace: true });
       }
     }
-  }, [user, profile, navigate]);
+  }, [user, profile, navigate, redirectTo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +33,7 @@ const LoginForm = () => {
         if (loginRole === 'seller' || loggedInUser.user_type === 'seller') {
           navigate('/seller-dashboard');
         } else {
-          navigate('/');
+          navigate(redirectTo);
         }
       }
     } catch (err) {
@@ -161,7 +165,7 @@ const LoginForm = () => {
           
           <p className="mt-10 text-center text-on-surface-variant text-sm font-medium">
             Don't have an account? 
-            <Link to="/register" className="text-primary font-bold hover:underline underline-offset-4 ml-2">Create Account</Link>
+            <Link to={`/register${location.search}`} className="text-primary font-bold hover:underline underline-offset-4 ml-2">Create Account</Link>
           </p>
         </div>
       </div>

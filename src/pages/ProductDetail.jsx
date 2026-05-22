@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProductStore } from '../stores/productStore';
 import { useCartStore } from '../stores/cartStore';
 import { ProductReviews } from '../components/buyer/ProductReviews';
@@ -8,16 +8,22 @@ import { RelatedProducts } from '../components/buyer/RelatedProducts';
 
 const ProductDetail = () => {
   const { productId } = useParams();
-  const { getProductById, currentProduct, isLoading } = useProductStore();
+  const { getProduct, currentProduct, isLoading } = useProductStore();
   const { addToCart } = useCartStore();
   const [activeTab, setActiveTab] = useState('specs');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    getProductById(productId);
-  }, [getProductById, productId]);
+    getProduct(productId);
+  }, [getProduct, productId]);
 
   const handleAddToCart = () => {
-    addToCart(currentProduct, 1); // Add 1 by default or add a quantity selector
+    addToCart(currentProduct, 1);
+  };
+
+  const handleBuyNow = async () => {
+    await addToCart(currentProduct, 1);
+    navigate('/cart');
   };
 
   if (isLoading) {
@@ -87,7 +93,7 @@ const ProductDetail = () => {
               
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="text-3xl font-headline font-bold text-secondary">₹</span>
-                <span className="text-5xl font-headline font-black text-on-surface tracking-tighter">{currentProduct.price.toFixed(2)}</span>
+                <span className="text-5xl font-headline font-black text-on-surface tracking-tighter">{Number(currentProduct.price).toFixed(2)}</span>
               </div>
               
               <div className="space-y-6 text-on-surface-variant leading-relaxed">
@@ -95,7 +101,7 @@ const ProductDetail = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-surface-container-low">
                     <span className="text-xs uppercase tracking-widest block mb-1">Availability</span>
-                    <span className="text-on-surface font-semibold">{currentProduct.stock > 0 ? 'In Stock' : 'Out of Stock'}</span>
+                    <span className="text-on-surface font-semibold">{currentProduct.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}</span>
                   </div>
                   <div className="p-4 rounded-xl bg-surface-container-low">
                     <span className="text-xs uppercase tracking-widest block mb-1">Condition</span>
@@ -106,18 +112,25 @@ const ProductDetail = () => {
             </section>
 
             {/* Action Buttons */}
-            <div className="flex flex-col gap-4 mt-2">
+            <div className="flex flex-col sm:flex-row gap-4 mt-2">
               <button 
                 onClick={handleAddToCart}
-                disabled={currentProduct.stock <= 0}
-                className="w-full h-16 rounded-full bg-gradient-to-r from-primary to-primary-container text-white text-lg font-bold shadow-lg shadow-primary/20 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                disabled={currentProduct.stock_quantity <= 0}
+                className="flex-1 h-16 rounded-full border-2 border-primary text-primary text-lg font-bold hover:bg-primary/5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add to Cart
+              </button>
+              <button 
+                onClick={handleBuyNow}
+                disabled={currentProduct.stock_quantity <= 0}
+                className="flex-1 h-16 rounded-full bg-gradient-to-r from-secondary to-secondary-container text-white text-lg font-bold shadow-lg shadow-secondary/20 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Buy Now
               </button>
             </div>
 
             {/* Seller Info Card */}
-            <SellerInfo sellerId={currentProduct.sellerId} />
+            <SellerInfo sellerId={currentProduct.seller_id} />
           </div>
         </div>
       )}
@@ -157,7 +170,7 @@ const ProductDetail = () => {
             <div className="space-y-6">
               <h4 className="text-xl font-bold text-primary">Quality Assurance</h4>
               <p className="text-on-surface-variant leading-relaxed">
-                Every item is rigorously inspected to ensure quality and authenticity. Bazario's curated collection maintains the highest standards of craftsmanship.
+                Every item is rigorously inspected to ensure quality and authenticity. Bazario&apos;s curated collection maintains the highest standards of craftsmanship.
               </p>
               <div className="flex gap-4 items-center">
                 <span className="material-symbols-outlined text-secondary">verified</span>

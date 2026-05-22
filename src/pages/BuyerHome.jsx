@@ -305,7 +305,7 @@ const BuyerHome = () => {
                   const isOutOfStock = product.stock_quantity <= 0;
 
                   return (
-                    <div key={product.id} className="bg-surface-container-lowest border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group flex flex-col justify-between h-[420px]">
+                    <div key={product.id} className="bg-surface-container-lowest border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group flex flex-col justify-between min-h-[420px] h-full">
                       <div>
                         <div className="relative h-56 mb-6 rounded-lg overflow-hidden bg-gray-50">
                           <Link to={`/product/${product.id}`} className="block w-full h-full">

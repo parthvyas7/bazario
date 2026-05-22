@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 
 const RegisterForm = () => {
@@ -15,6 +15,7 @@ const RegisterForm = () => {
   
   const { signUp, user, profile, error, isLoading, clearError } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const RegisterForm = () => {
         }
       );
       
-      navigate('/login');
+      navigate(`/login${location.search}`);
     } catch (err) {
       // Error is handled by the store
     }
@@ -213,7 +214,7 @@ const RegisterForm = () => {
           
           <p className="mt-8 text-center text-on-surface-variant text-sm font-medium">
             Already have an account? 
-            <Link to="/login" className="text-primary font-bold hover:underline underline-offset-4 ml-2">Sign In</Link>
+            <Link to={`/login${location.search}`} className="text-primary font-bold hover:underline underline-offset-4 ml-2">Sign In</Link>
           </p>
         </div>
       </div>

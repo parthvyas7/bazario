@@ -293,7 +293,7 @@ const ProductListing = () => {
                   return (
                     <div
                       key={product.id}
-                      className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between h-[450px] relative"
+                      className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[450px] h-full relative"
                     >
                       <div>
                         {/* Image & Wishlist Button */}

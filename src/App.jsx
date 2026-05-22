@@ -7,6 +7,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useAuthStore } from "./stores/authStore";
+import { useCartStore } from "./stores/cartStore";
 import PropTypes from "prop-types";
 import { Analytics } from "@vercel/analytics/react";
 import { useEffect } from "react";
@@ -27,6 +28,7 @@ import BuyerHome from "./pages/BuyerHome";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, profile, isLoading } = useAuthStore();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -37,7 +39,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (requiredRole && profile?.user_type !== requiredRole) {
@@ -70,10 +72,23 @@ const SellerRedirectGuard = () => {
 
 const App = () => {
   const { user, profile, isInitialized, initialize, signOut } = useAuthStore();
+  const { cart, fetchCart } = useCartStore();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  useEffect(() => {
+    if (isInitialized) {
+      if (user) {
+        if (profile?.user_type === "buyer") {
+          fetchCart(user.id);
+        }
+      } else {
+        fetchCart(null);
+      }
+    }
+  }, [isInitialized, user, profile, fetchCart]);
 
   const handleSignOut = async () => {
     try {
@@ -108,29 +123,35 @@ const App = () => {
 
               {/* Navigation Links */}
               <div className="flex items-center gap-8 font-headline tracking-tight">
+                <Link
+                  to="/products"
+                  className="text-primary font-semibold hover:text-secondary transition-colors duration-300"
+                >
+                  Products
+                </Link>
+
+                <Link
+                  to="/cart"
+                  className="relative p-2 text-on-surface/70 hover:text-secondary transition-colors duration-300 flex items-center"
+                  aria-label="Shopping Cart"
+                >
+                  <span className="material-symbols-outlined text-2xl">shopping_cart</span>
+                  {cart.reduce((total, item) => total + item.quantity, 0) > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-white animate-pulse">
+                      {cart.reduce((total, item) => total + item.quantity, 0)}
+                    </span>
+                  )}
+                </Link>
+
                 {user ? (
                   <>
                     {profile?.user_type === "buyer" && (
-                      <>
-                        <Link
-                          to="/products"
-                          className="text-primary font-semibold hover:text-secondary transition-colors duration-300"
-                        >
-                          Products
-                        </Link>
-                        <Link
-                          to="/cart"
-                          className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
-                        >
-                          Cart
-                        </Link>
-                        <Link
-                          to="/orders"
-                          className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
-                        >
-                          My Orders
-                        </Link>
-                      </>
+                      <Link
+                        to="/orders"
+                        className="text-on-surface/70 hover:text-secondary transition-colors duration-300"
+                      >
+                        My Orders
+                      </Link>
                     )}
                     <div className="flex items-center gap-4 ml-4">
                       <span className="text-sm font-medium text-on-surface-variant truncate max-w-[150px]">
@@ -237,11 +258,7 @@ const App = () => {
             {/* Protected Routes */}
             <Route
               path="/cart"
-              element={
-                <ProtectedRoute requiredRole="buyer">
-                  <ShoppingCart />
-                </ProtectedRoute>
-              }
+              element={<ShoppingCart />}
             />
             <Route
               path="/checkout"
