@@ -228,12 +228,6 @@ const Navbar = ({ profile, user, handleSignOut, cart }) => {
 
         {/* Navigation Links */}
         <div className="flex items-center gap-8 font-headline tracking-tight flex-shrink-0">
-          <Link
-            to="/products"
-            className="text-primary font-semibold hover:text-secondary transition-colors duration-300"
-          >
-            Products
-          </Link>
 
           <Link
             to="/cart"

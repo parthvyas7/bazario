@@ -11,4 +11,11 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline;
   }
+  input, textarea, select {
+    transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+                border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+                box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+                transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+                outline-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  }
 }

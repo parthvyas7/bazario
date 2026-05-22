@@ -6,7 +6,7 @@ import { orderService } from "../utils/services";
 
 const Checkout = () => {
   const { cart, removeFromCart, totalAmount, clearCart } = useCartStore();
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const navigate = useNavigate();
   
   const [shippingInfo, setShippingInfo] = useState({
@@ -19,6 +19,15 @@ const Checkout = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (profile?.full_name) {
+      setShippingInfo(prev => ({
+        ...prev,
+        fullName: prev.fullName || profile.full_name
+      }));
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (!user) {

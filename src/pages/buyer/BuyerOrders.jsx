@@ -4,6 +4,7 @@ import supabase from "../../utils/supabase";
 const BuyerOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -164,7 +165,10 @@ const BuyerOrders = () => {
                         Cancel Order
                       </button>
                     )}
-                    <button className="text-xs font-bold px-4 py-2 rounded-full bg-primary text-white hover:bg-primary-container transition-colors shadow-sm">
+                    <button 
+                      onClick={() => setSelectedOrder(order)}
+                      className="text-xs font-bold px-4 py-2 rounded-full bg-primary text-white hover:bg-primary-container transition-colors shadow-sm"
+                    >
                       View Details
                     </button>
                   </div>
@@ -228,6 +232,90 @@ const BuyerOrders = () => {
           </div>
         </div>
       </section>
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-surface-container-lowest rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 md:p-8 border border-outline-variant/10 shadow-2xl space-y-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-headline font-bold text-2xl text-primary">
+                  Order Details
+                </h3>
+                <p className="text-xs text-on-surface-variant mt-1">
+                  ID: {selectedOrder.id}
+                </p>
+              </div>
+              <button 
+                onClick={() => setSelectedOrder(null)}
+                className="w-10 h-10 rounded-full hover:bg-surface-container-low flex items-center justify-center text-on-surface-variant transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-outline-variant/10">
+              <div>
+                <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Order Information</h4>
+                <div className="space-y-1 text-sm font-medium">
+                  <p className="text-on-surface">Status: <span className={`px-2 py-0.5 rounded text-xs font-bold inline-block uppercase
+                    ${selectedOrder.status === "Pending" ? "bg-secondary-fixed text-on-secondary-fixed" : 
+                      selectedOrder.status === "Shipped" ? "bg-tertiary-container/10 text-tertiary-container" : 
+                      selectedOrder.status === "Delivered" ? "bg-on-surface-variant/10 text-on-surface-variant" : 
+                      "bg-error-container text-on-error-container"}`}
+                  >{selectedOrder.status}</span></p>
+                  <p className="text-on-surface-variant">Date: {new Date(selectedOrder.created_at).toLocaleString()}</p>
+                  <p className="text-on-surface-variant">Payment Method: {selectedOrder.payment_method || 'UPI/Card'}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Delivery Address</h4>
+                <p className="text-sm font-medium text-on-surface whitespace-pre-line leading-relaxed">
+                  {selectedOrder.shipping_address?.replace(/, /g, '\n')}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-outline-variant/10">
+              <h4 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-4">Curated Items</h4>
+              <div className="space-y-4">
+                {selectedOrder.order_items.map((item) => (
+                  <div key={item.id} className="flex gap-4 items-center">
+                    <div className="w-16 h-16 bg-surface-container-low rounded-lg overflow-hidden shrink-0 border border-outline-variant/10">
+                      <img 
+                        src={item.products?.image_url || "/placeholder-image.png"} 
+                        alt={item.products?.name} 
+                        className="w-full h-full object-cover" 
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm text-on-surface truncate">{item.products?.name}</p>
+                      <p className="text-xs text-on-surface-variant">{item.products?.category}</p>
+                      <p className="text-xs text-on-surface-variant mt-0.5">Qty: {item.quantity} • ₹{item.price_at_purchase.toFixed(2)} each</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-sm text-on-surface">₹{(item.quantity * item.price_at_purchase).toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-outline-variant/10 flex justify-between items-center">
+              <div>
+                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Grand Total</p>
+                <p className="text-2xl font-headline font-black text-secondary">₹{selectedOrder.total_amount.toFixed(2)}</p>
+              </div>
+              <button 
+                onClick={() => setSelectedOrder(null)}
+                className="px-6 py-2.5 bg-primary text-white font-bold rounded-full text-xs shadow-md hover:bg-primary-container transition-all"
+              >
+                Close Details
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
