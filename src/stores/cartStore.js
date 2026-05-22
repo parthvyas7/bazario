@@ -108,6 +108,37 @@ export const useCartStore = create((set, get) => ({
     }
   },
   
+  updateQuantity: async (productId, quantity) => {
+    if (quantity <= 0) {
+      const item = get().cart.find(i => i.product_id === productId);
+      if (item) {
+        return get().removeFromCart(item.id);
+      }
+      return;
+    }
+
+    const user = useAuthStore.getState().user;
+    if (!user) {
+      const currentCart = [...get().cart];
+      const itemIndex = currentCart.findIndex(item => item.product_id === productId);
+      
+      if (itemIndex > -1) {
+        currentCart[itemIndex].quantity = quantity;
+        localStorage.setItem('bazario_guest_cart', JSON.stringify(currentCart));
+        set({ cart: currentCart });
+      }
+      return;
+    }
+    
+    set({ isLoading: true });
+    try {
+      await cartService.updateCartItemQuantity(user.id, productId, quantity);
+      await get().fetchCart(user.id);
+    } catch (error) {
+      set({ error: error.message, isLoading: false });
+    }
+  },
+  
   clearCart: () => {
     localStorage.removeItem('bazario_guest_cart');
     set({ cart: [] });

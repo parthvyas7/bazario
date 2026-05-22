@@ -477,21 +477,46 @@ const AddProductContent = ({ newProduct, setNewProduct, handleAddProduct, editin
                   <h3 className="font-jakarta font-bold text-on-surface">Shipping Profile</h3>
                   <p className="text-xs text-on-surface-variant font-medium mb-3">Define the fulfillment speed and regions</p>
                 </div>
-                <select
-                  value={newProduct.shipping_profile || 'Standard'}
-                  onChange={(e) => setNewProduct({...newProduct, shipping_profile: e.target.value})}
-                  className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all font-jakarta text-on-surface text-sm"
-                >
-                  <option value="Standard">Standard Shipping (3-5 day regional shipping)</option>
-                  <option value="Express">Express Shipping (1-2 day fast delivery)</option>
-                  <option value="Free">Free Shipping (Standard shipping with zero fee)</option>
-                </select>
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-2 font-jakarta">Profile Type</label>
+                    <select
+                      value={newProduct.shipping_profile || 'Standard'}
+                      onChange={(e) => setNewProduct({...newProduct, shipping_profile: e.target.value})}
+                      className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all font-jakarta text-on-surface text-sm appearance-none"
+                    >
+                      <option value="Standard">Standard Shipping</option>
+                      <option value="Express">Express Shipping</option>
+                      <option value="Free">Free Shipping</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-2 font-jakarta">Delivery Time (Days)</label>
+                    <input 
+                      className="w-full bg-surface-container-highest border-none rounded-xl px-5 py-3.5 focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all font-jakarta text-on-surface text-sm" 
+                      type="number" 
+                      min="1"
+                      max="60"
+                      value={newProduct.shipping_days ?? 5}
+                      onChange={(e) => setNewProduct({...newProduct, shipping_days: parseInt(e.target.value) || 5})}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </section>
 
           <section className="grid grid-cols-2 gap-4">
-            <div className="bg-tertiary-container text-white p-5 rounded-xl flex items-start gap-4">
+            <div className="relative group cursor-help bg-tertiary-container text-white p-5 rounded-xl flex items-start gap-4">
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 pointer-events-none opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
+                <div className="bg-neutral-900/95 text-white text-xs font-semibold font-jakarta py-2 px-3.5 rounded-lg shadow-xl backdrop-blur-sm border border-white/10 whitespace-nowrap flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px] text-amber-400" style={{fontVariationSettings: "'FILL' 1"}}>info</span>
+                  Coming soon...
+                </div>
+                <div className="w-2 h-2 bg-neutral-900/95 rotate-45 border-r border-b border-white/10 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
+              </div>
+
               <div className="p-2 bg-on-tertiary-container/20 rounded-lg">
                 <span className="material-symbols-outlined text-white">bolt</span>
               </div>
@@ -500,7 +525,16 @@ const AddProductContent = ({ newProduct, setNewProduct, handleAddProduct, editin
                 <p className="text-xs text-tertiary-fixed opacity-80 leading-relaxed mt-1">Automatically adjust prices based on market trends to stay competitive.</p>
               </div>
             </div>
-            <div className="bg-surface-container-high p-5 rounded-xl flex items-start gap-4">
+            <div className="relative group cursor-help bg-surface-container-high p-5 rounded-xl flex items-start gap-4">
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 pointer-events-none opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 z-50">
+                <div className="bg-neutral-900/95 text-white text-xs font-semibold font-jakarta py-2 px-3.5 rounded-lg shadow-xl backdrop-blur-sm border border-white/10 whitespace-nowrap flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px] text-amber-400" style={{fontVariationSettings: "'FILL' 1"}}>info</span>
+                  Coming soon...
+                </div>
+                <div className="w-2 h-2 bg-neutral-900/95 rotate-45 border-r border-b border-white/10 absolute -bottom-1 left-1/2 -translate-x-1/2"></div>
+              </div>
+
               <div className="p-2 bg-on-surface-variant/10 rounded-lg">
                 <span className="material-symbols-outlined text-primary">auto_awesome</span>
               </div>

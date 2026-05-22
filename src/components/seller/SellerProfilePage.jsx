@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import supabase from '../../utils/supabase';
 import { useCartStore } from '../../stores/cartStore';
 
@@ -40,6 +40,14 @@ const SellerProfilePage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatPrice = (price) => {
+    const priceNum = Number(price);
+    if (isNaN(priceNum)) return '0';
+    return priceNum % 1 === 0
+      ? priceNum.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      : priceNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   if (loading) {
@@ -130,22 +138,26 @@ const SellerProfilePage = () => {
                 key={product.id} 
                 className="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 hover:border-primary/20"
               >
-                <div className="aspect-[4/5] relative overflow-hidden bg-surface-container-low">
-                  <img 
-                    src={product.image_url || '/placeholder-image.png'} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  {/* Subtle gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                
-                <div className="p-6 flex-1 flex flex-col">
-                  <h4 className="font-headline font-bold text-lg text-on-surface line-clamp-1 mb-2 group-hover:text-primary transition-colors">{product.name}</h4>
-                  <p className="text-sm font-body text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">{product.description}</p>
+                <Link to={`/product/${product.id}`} className="block flex-1 flex flex-col">
+                  <div className="aspect-[4/5] w-full relative overflow-hidden bg-surface-container-low animate-fade-in">
+                    <img 
+                      src={product.image_url || '/placeholder-image.png'} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
                   
-                  <div className="mt-auto flex items-center justify-between pt-4 border-t border-surface-container-highest">
-                    <p className="font-headline font-black text-xl text-primary">₹{product.price.toFixed(2)}</p>
+                  <div className="p-6 flex-1 flex flex-col">
+                    <h4 className="font-headline font-bold text-lg text-on-surface line-clamp-1 mb-2 group-hover:text-primary transition-colors">{product.name}</h4>
+                    <p className="text-sm font-body text-on-surface-variant line-clamp-2 mb-4 leading-relaxed">{product.description}</p>
+                  </div>
+                </Link>
+                
+                <div className="px-6 pb-6 mt-auto">
+                  <div className="flex items-center justify-between pt-4 border-t border-surface-container-highest">
+                    <p className="font-headline font-black text-xl text-primary">₹{formatPrice(product.price)}</p>
                     <button 
                       onClick={() => addToCart(product)}
                       className="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors duration-300"

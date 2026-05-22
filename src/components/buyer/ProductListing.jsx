@@ -8,7 +8,7 @@ const ProductListing = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { addToCart } = useCartStore();
+  const { cart, addToCart, updateQuantity } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const navigate = useNavigate();
 
@@ -366,18 +366,42 @@ const ProductListing = () => {
                         </div>
 
                         <div className="flex gap-2">
-                          <button
-                            disabled={isOutOfStock}
-                            onClick={(e) => handleAddToCart(e, product)}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xs transition-colors ${
-                              isOutOfStock
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-primary text-white hover:bg-secondary'
-                            }`}
-                            title={isOutOfStock ? "Out of stock" : "Add to Cart"}
-                          >
-                            <span className="material-symbols-outlined text-sm">shopping_bag</span>
-                          </button>
+                          {(() => {
+                            const cartItem = cart.find(item => item.product_id === product.id);
+                            if (cartItem) {
+                              return (
+                                <div className="flex items-center bg-surface-container-high rounded-full px-2 h-10 gap-2 border border-outline-variant/30">
+                                  <button 
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateQuantity(product.id, cartItem.quantity - 1); }}
+                                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-on-surface hover:text-error transition-colors shadow-xs"
+                                  >
+                                    <span className="material-symbols-outlined text-sm">remove</span>
+                                  </button>
+                                  <span className="font-headline font-bold text-sm w-4 text-center">{cartItem.quantity}</span>
+                                  <button 
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateQuantity(product.id, cartItem.quantity + 1); }}
+                                    className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-on-surface hover:text-primary transition-colors shadow-xs"
+                                  >
+                                    <span className="material-symbols-outlined text-sm">add</span>
+                                  </button>
+                                </div>
+                              );
+                            }
+                            return (
+                              <button
+                                disabled={isOutOfStock}
+                                onClick={(e) => handleAddToCart(e, product)}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xs transition-colors ${
+                                  isOutOfStock
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-primary text-white hover:bg-secondary'
+                                }`}
+                                title={isOutOfStock ? "Out of stock" : "Add to Cart"}
+                              >
+                                <span className="material-symbols-outlined text-sm">shopping_bag</span>
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>

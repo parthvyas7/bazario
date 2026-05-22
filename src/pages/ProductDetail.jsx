@@ -10,12 +10,44 @@ import supabase from '../utils/supabase';
 const ProductDetail = () => {
   const { productId } = useParams();
   const { getProduct, currentProduct, isLoading } = useProductStore();
-  const { addToCart } = useCartStore();
+  const { cart, addToCart, updateQuantity } = useCartStore();
   const [activeTab, setActiveTab] = useState('specs');
   const navigate = useNavigate();
 
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  // Custom added state variables
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isNotified, setIsNotified] = useState(false);
+  const [notification, setNotification] = useState(null);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const imageConfigs = [
+    { id: 0, label: 'Default View', className: 'object-cover w-full h-full' },
+    { id: 1, label: 'Full View', className: 'object-contain p-4 bg-white/50 w-full h-full' },
+    { id: 2, label: 'Close-up View', className: 'object-cover scale-150 origin-center w-full h-full' }
+  ];
+
+  // Reset states when product changes
+  useEffect(() => {
+    setSelectedImageIndex(0);
+    setIsNotified(false);
+    setNotification(null);
+    setIsLightboxOpen(false);
+  }, [productId]);
+
+  const handleNotifyMe = () => {
+    setIsNotified(true);
+    setNotification({
+      type: 'success',
+      message: `Success! You will be notified as soon as ${currentProduct?.name} is back in stock.`
+    });
+    // Auto dismiss notification after 5s
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+  };
 
   const fetchReviews = useCallback(async () => {
     if (!productId) return;
@@ -66,6 +98,47 @@ const ProductDetail = () => {
 
   return (
     <main className="pt-28 pb-20 px-4 md:px-8 max-w-[1440px] mx-auto min-h-screen">
+      {/* Floating Toast Notification */}
+      {notification && (
+        <div className="fixed bottom-8 right-8 z-50 p-4 bg-slate-900 text-white rounded-xl shadow-2xl border border-slate-800/80 flex items-center gap-3 max-w-sm animate-bounce">
+          <span className="material-symbols-outlined text-secondary">
+            {notification.type === 'success' ? 'check_circle' : 'error'}
+          </span>
+          <span className="text-sm font-semibold">{notification.message}</span>
+          <button onClick={() => setNotification(null)} className="ml-auto hover:text-secondary flex items-center">
+            <span className="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+      )}
+
+      {/* Lightbox / Popout Modal */}
+      {isLightboxOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-4 transition-all duration-300"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button 
+            onClick={() => setIsLightboxOpen(false)}
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200"
+          >
+            <span className="material-symbols-outlined text-2xl">close</span>
+          </button>
+          
+          {/* Large image */}
+          <div 
+            className="relative max-w-5xl max-h-[85vh] overflow-hidden rounded-2xl bg-black/50 shadow-2xl flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image
+          >
+            <img 
+              className={`max-w-full max-h-[85vh] object-contain rounded-2xl ${imageConfigs[selectedImageIndex].id === 2 ? 'scale-125' : ''}`} 
+              src={currentProduct?.imageUrl || currentProduct?.image_url} 
+              alt={currentProduct.name} 
+            />
+          </div>
+        </div>
+      )}
+
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 mb-8 text-sm font-medium text-on-surface-variant uppercase tracking-widest">
         <Link className="hover:text-primary transition-colors" to="/">Home</Link>
@@ -80,21 +153,39 @@ const ProductDetail = () => {
           {/* Left: Product Image Gallery (Bento-ish layout) */}
           <div className="lg:col-span-7 flex flex-col md:flex-row gap-4">
             <div className="flex md:flex-col gap-4 order-2 md:order-1 no-scrollbar overflow-x-auto">
-              {/* Dummy thumbnails since we only have one imageUrl */}
-              <div className="w-20 h-20 rounded-xl overflow-hidden cursor-pointer ring-2 ring-primary bg-surface-container-lowest shrink-0">
-                <img className="w-full h-full object-cover" src={currentProduct?.imageUrl || currentProduct?.image_url} alt={currentProduct.name} />
-              </div>
-              <div className="w-20 h-20 rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-outline-variant bg-surface-container-lowest transition-all shrink-0">
-                <img className="w-full h-full object-cover opacity-80 hover:opacity-100" src={currentProduct?.imageUrl || currentProduct?.image_url} alt="Thumbnail 2" />
-              </div>
-              <div className="w-20 h-20 rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-outline-variant bg-surface-container-lowest transition-all shrink-0">
-                <img className="w-full h-full object-cover opacity-80 hover:opacity-100" src={currentProduct?.imageUrl || currentProduct?.image_url} alt="Thumbnail 3" />
-              </div>
+              {imageConfigs.map((config, index) => (
+                <div
+                  key={config.id}
+                  onClick={() => setSelectedImageIndex(index)}
+                  className={`w-20 h-20 rounded-xl overflow-hidden cursor-pointer bg-surface-container-lowest shrink-0 transition-all ${
+                    selectedImageIndex === index 
+                      ? 'ring-2 ring-primary scale-95 shadow-sm' 
+                      : 'hover:ring-2 ring-outline-variant opacity-80 hover:opacity-100'
+                  }`}
+                >
+                  <img 
+                    className={`w-full h-full object-cover`} 
+                    src={currentProduct?.imageUrl || currentProduct?.image_url} 
+                    alt={config.label} 
+                  />
+                </div>
+              ))}
             </div>
             
             <div className="flex-1 relative group order-1 md:order-2 overflow-visible">
-              <div className="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container-low transition-transform duration-500 hover:scale-[1.02]">
-                <img className="w-full h-full object-cover" src={currentProduct?.imageUrl || currentProduct?.image_url} alt={currentProduct.name} />
+              <div 
+                onClick={() => setIsLightboxOpen(true)}
+                className="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container-low transition-transform duration-500 hover:scale-[1.02] cursor-zoom-in relative"
+              >
+                <img 
+                  className={`w-full h-full transition-all duration-300 ${imageConfigs[selectedImageIndex].className}`} 
+                  src={currentProduct?.imageUrl || currentProduct?.image_url} 
+                  alt={currentProduct.name} 
+                />
+                {/* Hover indication */}
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span className="material-symbols-outlined text-white text-3xl drop-shadow-md">zoom_in</span>
+                </div>
               </div>
               
               {/* Optional Edition badge */}
@@ -138,19 +229,23 @@ const ProductDetail = () => {
               
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="text-3xl font-headline font-bold text-secondary">₹</span>
-                <span className="text-5xl font-headline font-black text-on-surface tracking-tighter">{Number(currentProduct.price).toFixed(2)}</span>
+                <span className="text-5xl font-headline font-black text-on-surface tracking-tighter">
+                  {(() => {
+                    const priceNum = Number(currentProduct.price);
+                    if (isNaN(priceNum)) return '0';
+                    return priceNum % 1 === 0
+                      ? priceNum.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                      : priceNum.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                  })()}
+                </span>
               </div>
               
               <div className="space-y-6 text-on-surface-variant leading-relaxed">
                 <p className="text-lg">{currentProduct.description}</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div className="p-4 rounded-xl bg-surface-container-low">
                     <span className="text-xs uppercase tracking-widest block mb-1">Availability</span>
                     <span className="text-on-surface font-semibold">{currentProduct.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}</span>
-                  </div>
-                  <div className="p-4 rounded-xl bg-surface-container-low">
-                    <span className="text-xs uppercase tracking-widest block mb-1">Condition</span>
-                    <span className="text-on-surface font-semibold">Brand New</span>
                   </div>
                 </div>
               </div>
@@ -158,20 +253,61 @@ const ProductDetail = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mt-2">
-              <button 
-                onClick={handleAddToCart}
-                disabled={currentProduct.stock_quantity <= 0}
-                className="flex-1 h-16 rounded-full border-2 border-primary text-primary text-lg font-bold hover:bg-primary/5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add to Cart
-              </button>
-              <button 
-                onClick={handleBuyNow}
-                disabled={currentProduct.stock_quantity <= 0}
-                className="flex-1 h-16 rounded-full bg-gradient-to-r from-secondary to-secondary-container text-white text-lg font-bold shadow-lg shadow-secondary/20 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Buy Now
-              </button>
+              {currentProduct.stock_quantity <= 0 ? (
+                <button 
+                  onClick={handleNotifyMe}
+                  disabled={isNotified}
+                  className={`w-full h-16 rounded-full text-white text-lg font-bold shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
+                    isNotified 
+                      ? 'bg-success/80 shadow-success/10 cursor-default' 
+                      : 'bg-primary hover:bg-primary-container shadow-primary/20 hover:scale-[1.01]'
+                  }`}
+                >
+                  <span className="material-symbols-outlined">
+                    {isNotified ? 'check_circle' : 'notifications'}
+                  </span>
+                  {isNotified ? 'Notification Registered' : 'Notify me'}
+                </button>
+              ) : (
+                <>
+                  {(() => {
+                    const cartItem = cart.find(item => item.product_id === currentProduct.id);
+                    if (cartItem) {
+                      return (
+                        <div className="flex-1 h-16 rounded-full border-2 border-primary text-primary text-lg font-bold flex items-center justify-between px-6 bg-surface-container-low shadow-sm">
+                          <button 
+                            onClick={() => updateQuantity(currentProduct.id, cartItem.quantity - 1)}
+                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:text-error transition-colors shadow-xs"
+                          >
+                            <span className="material-symbols-outlined">remove</span>
+                          </button>
+                          <span className="w-10 text-center font-headline font-black text-xl">{cartItem.quantity}</span>
+                          <button 
+                            onClick={() => updateQuantity(currentProduct.id, cartItem.quantity + 1)}
+                            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:text-primary transition-colors shadow-xs"
+                          >
+                            <span className="material-symbols-outlined">add</span>
+                          </button>
+                        </div>
+                      );
+                    }
+                    return (
+                      <button 
+                        onClick={handleAddToCart}
+                        className="flex-1 h-16 rounded-full border-2 border-primary text-primary text-lg font-bold hover:bg-primary/5 active:scale-[0.98] transition-all"
+                      >
+                        Add to Cart
+                      </button>
+                    );
+                  })()}
+                  <button 
+                    onClick={handleBuyNow}
+                    className="flex-1 h-16 rounded-full bg-gradient-to-r from-secondary to-secondary-container text-white text-lg font-bold shadow-lg shadow-secondary/20 hover:scale-[1.01] active:scale-[0.98] transition-all"
+                  >
+                    Buy Now
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Seller Info Card */}

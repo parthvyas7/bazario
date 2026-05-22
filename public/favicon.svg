@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#373a9b" />
+      <stop offset="50%" stop-color="#2e3192" />
+      <stop offset="100%" stop-color="#15157d" />
+    </linearGradient>
+    
+    <!-- Letter B Gradient -->
+    <linearGradient id="letterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e2e6f8" />
+    </linearGradient>
+    
+    <!-- Soft Glow / Drop Shadow Filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#04003d" flood-opacity="0.4" />
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.2" />
+    </filter>
+
+    <!-- Glossy Overlay Gradient -->
+    <linearGradient id="glossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.12" />
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.04" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Background -->
+  <rect x="24" y="24" width="464" height="464" rx="112" ry="112" fill="url(#bgGrad)" filter="url(#shadow)" />
+  
+  <!-- Subtle Glossy Inner Border -->
+  <rect x="25" y="25" width="462" height="462" rx="111" ry="111" fill="none" stroke="url(#glossGrad)" stroke-width="3" />
+
+  <!-- Styled Letter 'B' with Inner Cutouts -->
+  <path d="M168 120h90c45 0 80 30 80 70c0 28-18 50-45 60c32 10 50 35 50 70c0 45-35 72-85 72h-90V120z M218 165h40c20 0 35 12 35 30c0 18-15 30-35 30h-40V165z M218 275h45c22 0 40 12 40 32c0 20-18 32-40 32h-45V275z" 
+        fill="url(#letterGrad)" 
+        fill-rule="evenodd" />
+</svg>

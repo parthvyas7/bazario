@@ -3,7 +3,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { Link, useNavigate } from "react-router-dom";
 
 const ShoppingCart = () => {
-  const { cart, removeFromCart } = useCartStore();
+  const { cart, removeFromCart, updateQuantity } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -45,17 +45,21 @@ const ShoppingCart = () => {
             <div className="space-y-4">
               {cart.map((item) => (
                 <div key={item.id} className="group flex flex-col sm:flex-row gap-6 p-4 bg-surface-container-lowest rounded-xl transition-all duration-300 hover:shadow-lg border border-outline-variant/10">
-                  <div className="relative overflow-hidden rounded-lg aspect-square w-full sm:w-32 h-32 flex-shrink-0 bg-surface-container-low">
-                    <img
-                      src={item.image_url || "/placeholder-image.png"}
-                      alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                  <div className="relative overflow-hidden rounded-lg w-full sm:w-32 h-32 flex-shrink-0 bg-surface-container-low">
+                    <Link to={`/product/${item.product_id || item.id}`} className="block w-full h-full">
+                      <img
+                        src={item.image_url || "/placeholder-image.png"}
+                        alt={item.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </Link>
                   </div>
                   <div className="flex flex-col justify-between flex-grow">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-headline font-bold text-lg text-on-surface line-clamp-1">{item.name}</h3>
+                        <Link to={`/product/${item.product_id || item.id}`} className="hover:text-primary transition-colors">
+                          <h3 className="font-headline font-bold text-lg text-on-surface line-clamp-1">{item.name}</h3>
+                        </Link>
                         <p className="text-sm text-on-surface-variant line-clamp-1">{item.description}</p>
                       </div>
                       <button 
@@ -66,8 +70,20 @@ const ShoppingCart = () => {
                       </button>
                     </div>
                     <div className="flex justify-between items-end mt-4">
-                      <div className="flex items-center bg-surface-container-high rounded-full px-3 py-1 gap-4">
-                        <span className="font-headline font-semibold text-sm">Qty: {item.quantity}</span>
+                      <div className="flex items-center bg-surface-container-high rounded-full px-2 h-10 gap-2 border border-outline-variant/30">
+                        <button 
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateQuantity(item.product_id || item.id, item.quantity - 1); }}
+                          className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-on-surface hover:text-error transition-colors shadow-xs"
+                        >
+                          <span className="material-symbols-outlined text-sm">remove</span>
+                        </button>
+                        <span className="font-headline font-bold text-sm w-4 text-center">{item.quantity}</span>
+                        <button 
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateQuantity(item.product_id || item.id, item.quantity + 1); }}
+                          className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-on-surface hover:text-primary transition-colors shadow-xs"
+                        >
+                          <span className="material-symbols-outlined text-sm">add</span>
+                        </button>
                       </div>
                       <div className="text-right">
                         <span className="text-secondary font-headline font-bold">₹</span>

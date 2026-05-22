@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
-import { orderService } from "../utils/services";
+import { orderService, authService } from "../utils/services";
 
 const Checkout = () => {
   const { cart, removeFromCart, totalAmount, clearCart } = useCartStore();
@@ -21,10 +21,15 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (profile?.full_name) {
+    if (profile) {
       setShippingInfo(prev => ({
         ...prev,
-        fullName: prev.fullName || profile.full_name
+        fullName: profile.address_details?.fullName || profile.full_name || prev.fullName,
+        address: profile.address_details?.address || prev.address,
+        city: profile.address_details?.city || prev.city,
+        postalCode: profile.address_details?.postalCode || prev.postalCode,
+        country: profile.address_details?.country || prev.country,
+        phone: profile.address_details?.phone || prev.phone
       }));
     }
   }, [profile]);
@@ -69,6 +74,15 @@ const Checkout = () => {
       };
       
       await orderService.createOrder(orderData);
+      
+      if (user && profile && profile.user_type === 'buyer') {
+        try {
+          await authService.updateBuyerProfile(user.id, { address_details: shippingInfo });
+        } catch (err) {
+          console.error("Failed to save address details to profile", err);
+        }
+      }
+
       clearCart();
       navigate('/order-confirmation');
     } catch (error) {

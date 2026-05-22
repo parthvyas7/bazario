@@ -5,9 +5,11 @@ const BuyerOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [rewardPoints, setRewardPoints] = useState(0);
 
   useEffect(() => {
     fetchOrders();
+    setRewardPoints(Math.floor(Math.random() * (10000 - 10 + 1)) + 10);
   }, []);
 
   const fetchOrders = async () => {
@@ -94,7 +96,7 @@ const BuyerOrders = () => {
           <div className="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex items-center justify-between group overflow-hidden relative border border-outline-variant/10">
             <div>
               <p className="text-sm font-medium text-on-surface-variant">Rewards Points</p>
-              <h2 className="text-3xl font-bold font-headline text-secondary">2,450</h2>
+              <h2 className="text-3xl font-bold font-headline text-secondary">{rewardPoints.toLocaleString()}</h2>
             </div>
             <span className="material-symbols-outlined text-4xl text-secondary/10 group-hover:scale-125 transition-transform" style={{fontVariationSettings: "'FILL' 1"}}>loyalty</span>
             <div className="absolute bottom-0 left-0 h-1 w-full bg-secondary opacity-20"></div>
@@ -116,15 +118,25 @@ const BuyerOrders = () => {
                 <p className="text-on-surface-variant font-medium">You have no orders yet.</p>
               </div>
             ) : (
-              orders.map((order) => (
-                <div key={order.id} className="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex flex-col gap-4 border border-outline-variant/10">
-                  <div className="flex justify-between items-start border-b border-surface-container-highest pb-4">
-                    <div>
-                      <h4 className="font-bold text-on-surface font-headline">Order #{order.id.slice(0,8).toUpperCase()}</h4>
-                      <p className="text-xs text-on-surface-variant">
-                        Ordered on {new Date(order.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                      </p>
-                    </div>
+              orders.map((order) => {
+                const maxShippingDays = Math.max(...order.order_items.map(item => item.products?.shipping_days || 5));
+                const expectedDeliveryDate = new Date(order.created_at);
+                expectedDeliveryDate.setDate(expectedDeliveryDate.getDate() + maxShippingDays);
+
+                return (
+                  <div key={order.id} className="bg-surface-container-lowest p-5 rounded-xl shadow-sm flex flex-col gap-4 border border-outline-variant/10">
+                    <div className="flex justify-between items-start border-b border-surface-container-highest pb-4">
+                      <div>
+                        <h4 className="font-bold text-on-surface font-headline">Order #{order.id.slice(0,8).toUpperCase()}</h4>
+                        <p className="text-xs text-on-surface-variant">
+                          Ordered on {new Date(order.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                        </p>
+                        {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
+                          <p className="text-xs font-semibold text-secondary mt-1">
+                            Expected Delivery: {expectedDeliveryDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          </p>
+                        )}
+                      </div>
                     <div className="text-right">
                       <p className="font-bold font-headline text-on-surface"><span className="text-secondary">₹</span>{order.total_amount.toFixed(2)}</p>
                       <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded leading-none inline-block mt-1
@@ -173,7 +185,7 @@ const BuyerOrders = () => {
                     </button>
                   </div>
                 </div>
-              ))
+              )})
             )}
           </div>
 
@@ -218,7 +230,7 @@ const BuyerOrders = () => {
             
             {/* Contextual Action Items */}
             <div className="grid grid-cols-1 gap-4">
-              <div className="bg-surface-container-high p-4 rounded-xl border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+              <div title="Coming soon..." className="bg-surface-container-high p-4 rounded-xl border border-transparent hover:border-primary/20 transition-all cursor-pointer">
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-secondary text-xl">support_agent</span>
                   <div>

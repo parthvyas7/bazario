@@ -236,7 +236,7 @@ const Navbar = ({ profile, user, handleSignOut, cart }) => {
           >
             <span className="material-symbols-outlined text-2xl">shopping_cart</span>
             {cart.reduce((total, item) => total + item.quantity, 0) > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-white animate-pulse">
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-bold text-white">
                 {cart.reduce((total, item) => total + item.quantity, 0)}
               </span>
             )}

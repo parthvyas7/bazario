@@ -11,7 +11,7 @@ const BuyerHome = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
-  const { addToCart } = useCartStore();
+  const { cart, addToCart, updateQuantity } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
   const navigate = useNavigate();
 
@@ -346,17 +346,41 @@ const BuyerHome = () => {
                             {Number(product.price).toLocaleString('en-IN')}
                           </span>
                         </div>
-                        <button
-                          disabled={isOutOfStock}
-                          onClick={(e) => handleAddToCart(e, product)}
-                          className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-xs ${
-                            isOutOfStock
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-primary text-white hover:bg-secondary'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-sm">shopping_bag</span>
-                        </button>
+                        {(() => {
+                          const cartItem = cart.find(item => item.product_id === product.id);
+                          if (cartItem) {
+                            return (
+                              <div className="flex items-center bg-surface-container-high rounded-full px-2 h-10 gap-2 border border-outline-variant/30">
+                                <button 
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateQuantity(product.id, cartItem.quantity - 1); }}
+                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-on-surface hover:text-error transition-colors shadow-xs"
+                                >
+                                  <span className="material-symbols-outlined text-sm">remove</span>
+                                </button>
+                                <span className="font-headline font-bold text-sm w-4 text-center">{cartItem.quantity}</span>
+                                <button 
+                                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateQuantity(product.id, cartItem.quantity + 1); }}
+                                  className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-on-surface hover:text-primary transition-colors shadow-xs"
+                                >
+                                  <span className="material-symbols-outlined text-sm">add</span>
+                                </button>
+                              </div>
+                            );
+                          }
+                          return (
+                            <button
+                              disabled={isOutOfStock}
+                              onClick={(e) => handleAddToCart(e, product)}
+                              className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-xs ${
+                                isOutOfStock
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  : 'bg-primary text-white hover:bg-secondary'
+                              }`}
+                            >
+                              <span className="material-symbols-outlined text-sm">shopping_bag</span>
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
@@ -371,7 +395,7 @@ const BuyerHome = () => {
         {/* Quality Statement / Trust Banner */}
         <section className="px-8 py-20 bg-primary text-white text-center rounded-2xl mx-8 shadow-md">
           <div className="max-w-4xl mx-auto">
-            <span className="material-symbols-outlined text-6xl text-secondary mb-6 animate-pulse">verified</span>
+            <span className="material-symbols-outlined text-6xl text-secondary mb-6">verified</span>
             <h2 className="text-4xl font-headline font-black mb-6 tracking-tight">The Bazaar Quality Promise</h2>
             <p className="text-xl font-body text-primary-fixed-dim leading-relaxed">
               We personally vet every seller in the Bazario ecosystem. From the materials used in your apparel to the source code in your tech, we ensure everything meets the highest standards of Indian excellence.
@@ -394,15 +418,51 @@ const BuyerHome = () => {
               </p>
               {/* Social icons */}
               <div className="flex gap-4">
-                {['facebook', 'instagram', 'twitter', 'youtube'].map((social) => (
+                {[
+                  {
+                    name: 'facebook',
+                    url: 'https://facebook.com',
+                    icon: (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
+                      </svg>
+                    )
+                  },
+                  {
+                    name: 'instagram',
+                    url: 'https://instagram.com',
+                    icon: (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                      </svg>
+                    )
+                  },
+                  {
+                    name: 'twitter',
+                    url: 'https://twitter.com',
+                    icon: (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    )
+                  },
+                  {
+                    name: 'youtube',
+                    url: 'https://youtube.com',
+                    icon: (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.87.507 9.388.507 9.388.507s7.518 0 9.388-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                    )
+                  }
+                ].map((social) => (
                   <a
-                    key={social}
-                    href={`https://${social}.com`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:border-secondary hover:text-secondary hover:scale-105 transition-all"
+                    key={social.name}
+                    href="#"
+                    aria-label={social.name}
+                    className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center hover:border-secondary hover:text-secondary hover:scale-105 transition-all text-slate-400"
                   >
-                    <span className="material-symbols-outlined text-lg">public</span>
+                    {social.icon}
                   </a>
                 ))}
               </div>

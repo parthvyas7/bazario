@@ -202,6 +202,17 @@ export const authService = {
       console.error('Error fetching profile:', error);
       throw error;
     }
+  },
+
+  async updateBuyerProfile(buyerId, profileData) {
+    const { data, error } = await supabase
+      .from('buyers')
+      .update(profileData)
+      .eq('id', buyerId)
+      .select();
+
+    if (error) throw error;
+    return data[0];
   }
 };
 
@@ -411,6 +422,18 @@ export const cartService = {
       .from('cart_items')
       .select('*, products(*)')
       .eq('buyer_id', userId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateCartItemQuantity(userId, productId, quantity) {
+    const { data, error } = await supabase
+      .from('cart_items')
+      .update({ quantity })
+      .eq('buyer_id', userId)
+      .eq('product_id', productId)
+      .select();
 
     if (error) throw error;
     return data;
