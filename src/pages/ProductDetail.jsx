@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useProductStore } from '../stores/productStore';
 import { useCartStore } from '../stores/cartStore';
 import { ProductReviews } from '../components/buyer/ProductReviews';
 import { SellerInfo } from '../components/buyer/SellerInfo';
 import { RelatedProducts } from '../components/buyer/RelatedProducts';
+import supabase from '../utils/supabase';
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -13,9 +14,33 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState('specs');
   const navigate = useNavigate();
 
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  const fetchReviews = useCallback(async () => {
+    if (!productId) return;
+    setReviewsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*, buyers(full_name)")
+        .eq("product_id", productId)
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        setReviews(data);
+      }
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, [productId]);
+
   useEffect(() => {
     getProduct(productId);
-  }, [getProduct, productId]);
+    fetchReviews();
+  }, [getProduct, productId, fetchReviews]);
 
   const handleAddToCart = () => {
     addToCart(currentProduct, 1);
@@ -33,6 +58,11 @@ const ProductDetail = () => {
       </div>
     );
   }
+
+  const reviewsCount = reviews.length;
+  const averageRating = reviewsCount > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewsCount
+    : 0;
 
   return (
     <main className="pt-28 pb-20 px-4 md:px-8 max-w-[1440px] mx-auto min-h-screen">
@@ -80,14 +110,29 @@ const ProductDetail = () => {
           <div className="lg:col-span-5 flex flex-col gap-8">
             <section>
               <div className="flex items-center gap-2 mb-2">
-                <div className="flex text-secondary">
-                  <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
-                  <span className="material-symbols-outlined text-sm">star_half</span>
+                <div className="flex text-secondary text-sm">
+                  {[...Array(5)].map((_, i) => {
+                    const starValue = i + 1;
+                    let fillVal = 0;
+                    let starIcon = 'star';
+                    if (averageRating >= starValue) {
+                      fillVal = 1;
+                    } else if (averageRating >= starValue - 0.5) {
+                      fillVal = 1;
+                      starIcon = 'star_half';
+                    } else {
+                      fillVal = 0;
+                    }
+                    return (
+                      <span key={i} className="material-symbols-outlined text-sm select-none" style={{fontVariationSettings: `'FILL' ${fillVal}`}}>
+                        {starIcon}
+                      </span>
+                    );
+                  })}
                 </div>
-                <span className="text-xs font-medium text-on-surface-variant">(4.8 / 124 reviews)</span>
+                <span className="text-xs font-medium text-on-surface-variant">
+                  {reviews.length > 0 ? `(${averageRating.toFixed(1)} / ${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'})` : '(0.0 / 0 reviews)'}
+                </span>
               </div>
               <h1 className="text-4xl font-extrabold text-primary mb-4 leading-tight">{currentProduct.name}</h1>
               
@@ -148,7 +193,7 @@ const ProductDetail = () => {
             onClick={() => setActiveTab('reviews')}
             className={`pb-4 border-b-2 font-bold whitespace-nowrap ${activeTab === 'reviews' ? 'border-secondary text-primary' : 'border-transparent text-on-surface-variant hover:text-primary transition-colors'}`}
           >
-            Reviews (124)
+            Reviews ({reviewsCount})
           </button>
         </div>
 
@@ -182,7 +227,12 @@ const ProductDetail = () => {
 
         {activeTab === 'reviews' && (
           <div>
-            <ProductReviews productId={productId} />
+            <ProductReviews 
+              productId={productId} 
+              reviews={reviews} 
+              loading={reviewsLoading} 
+              onReviewSubmitted={fetchReviews} 
+            />
           </div>
         )}
       </section>

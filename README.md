@@ -1,39 +1,64 @@
-# Bazario
+# 🛍️ Bazario
 
-A React-based e-commerce platform using Supabase, Connects sellers and buyers with features for product management, ordering, and user interactions.
+Bazario is a premium React-based e-commerce platform powered by Supabase. It features an elegant UI, real-time analytics, role-based workflows for buyers and sellers, and interactive product reviews.
 
-- **eCommerce application** which will have two types of users i.e.
-	+ Sellers who can: Register as Seller, Login, Setup their store, Add products, Edit products, Delete products, View Received Orders, Update Order Status (Pending, Shipped, Delivered),
-	+ Buyers who can register, Login, Browse products by all sellers, Add products to cart, Checkout, View order history, View order status, Cancel order, View seller profile, View seller products
+---
 
-## Demo
+## 📸 Screenshots
 
-[Visit](https://bazario.vercel.app/)
+### 🛒 Buyer Portal
+![Buyer Home Bento](./screenshots/buyer_home_bento.png)
+![Buyer Products Catalog](./screenshots/buyer_products_page.png)
 
-[Stitch Prototype](https://stitch.withgoogle.com/preview/3842891001526214468?node-id=4c6337dc2ea64b3f8b871554f4847ca4)
+### 📊 Seller Dashboard
+![Seller Dashboard Overview](./screenshots/dashboard_overview.png)
+![Seller Dashboard Inventory](./screenshots/dashboard_inventory.png)
 
-## Screenshots
+---
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+## ✨ Features
 
-## Environment Variables
+* **Buyer Experience**: Live global search autocomplete, advanced catalog filtering, persistent shopping cart/wishlist (Zustand), and interactive review submissions with multi-image uploads.
+* **Seller Tools**: Real-time sales metrics/charts, listing CRUD management with pagination, order state tracking (Pending/Shipped/Delivered), and storefront profile customizer.
+* **Database & Storage**: PostgreSQL backing, row-level security (RLS), and review images hosted via Supabase Storage.
 
-To run this project, you will need to add the relevant environment variables to your `.env` file
+---
 
-See `.env.example`
+## 🛠️ Tech Stack
 
-## Features
+* **Frontend**: React 18, TailwindCSS (v3), Zustand, React Router DOM (v6), Vite
+* **Backend**: Supabase (Database, Auth, Storage)
 
-## Run Locally
+---
 
+## ⚙️ Environment Variables
 
-## Tech Stack
+Create a `.env` file at the root:
 
-**Client:** React, Zustand, TailwindCSS, Vite, React Router, React Query
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-**Server:** Supabase
+---
 
-## License
+## 🏃 Run Locally
 
-[MIT](https://choosealicense.com/licenses/mit/)
+```bash
+npm install
+npm run dev     # Dev server
+npm run build   # Production build
+```
 
+---
+
+## 🗺️ Project Roadmap
+
+# TODO
+- [ ] Login with mobile number
+
+---
+
+## 📄 License
+
+[MIT License](https://choosealicense.com/licenses/mit/)

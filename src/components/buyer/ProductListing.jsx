@@ -23,13 +23,20 @@ const ProductListing = () => {
   // Mobile sidebar state
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  // Sync category from URL parameter
+  // Sync category and search query from URL parameters
   useEffect(() => {
     const catParam = searchParams.get('category');
     if (catParam) {
       setSelectedCategory(catParam);
     } else {
       setSelectedCategory('All');
+    }
+
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    } else {
+      setSearchTerm('');
     }
   }, [searchParams]);
 
@@ -151,22 +158,11 @@ const ProductListing = () => {
           </div>
         </div>
 
-        {/* Toolbar: Search, Sort and Mobile Filter Toggle */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="relative flex-grow">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-            <input
-              type="text"
-              placeholder="Search by product name, description or category..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-6 py-4 rounded-xl border border-gray-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-on-surface font-body"
-            />
-          </div>
-
-          <div className="flex gap-4">
+        {/* Toolbar: Sort and Mobile Filter Toggle */}
+        <div className="flex justify-end gap-4 mb-8">
+          <div className="flex gap-4 w-full md:w-auto justify-end">
             {/* Sort Dropdown */}
-            <div className="relative min-w-[200px] flex-grow md:flex-grow-0">
+            <div className="relative min-w-[220px] flex-grow md:flex-grow-0">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">sort</span>
               <select
                 value={sortBy}
