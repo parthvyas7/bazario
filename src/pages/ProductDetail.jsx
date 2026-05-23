@@ -189,12 +189,6 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              {/* Optional Edition badge */}
-              {currentProduct.price > 1000 && (
-                <div className="absolute -bottom-4 -right-4 bg-secondary-fixed p-4 rounded-xl shadow-lg hidden md:block">
-                  <span className="text-on-secondary-fixed text-xs font-bold uppercase tracking-wider">Premium Selection</span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -234,15 +228,9 @@ const ProductDetail = () => {
                     {formatPrice(currentProduct.price)}
                 </span>
               </div>
-              
-              <div className="space-y-6 text-on-surface-variant leading-relaxed">
+
+              <div className="space-y-6 text-on-surface-variant leading-relaxed mt-4">
                 <p className="text-lg">{currentProduct.description}</p>
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 rounded-xl bg-surface-container-low">
-                    <span className="text-xs uppercase tracking-widest block mb-1">Availability</span>
-                    <span className="text-on-surface font-semibold">{currentProduct.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}</span>
-                  </div>
-                </div>
               </div>
             </section>
 

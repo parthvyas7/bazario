@@ -34,12 +34,15 @@ export const authService = {
   },
 
   async signIn(email, password, role) {
+    console.log("Attempting signIn with:", { email, role });
     if (role) {
       const { data: buyerData, error: roleError } = await supabase
         .from('buyers')
         .select('id, role')
         .eq('email', email)
         .maybeSingle();
+
+      console.log("Role check result:", { buyerData, roleError });
 
       if (roleError) {
         throw new Error('Role verification failed. Please try again.');
@@ -55,6 +58,8 @@ export const authService = {
           .select('seller_id')
           .eq('seller_id', buyerData.id)
           .maybeSingle();
+
+        console.log("Seller check result:", { sellerData, sellerError });
 
         if (sellerError || !sellerData) {
           throw new Error('This email is not registered as a seller.');
@@ -302,37 +307,71 @@ export const productService = {
 // Order Service
 export const orderService = {
   async createOrder(orderData) {
-    const sellerId = orderData.items[0]?.seller_id;
     const shippingAddress = `${orderData.shippingInfo.fullName}, ${orderData.shippingInfo.address}, ${orderData.shippingInfo.city}, ${orderData.shippingInfo.postalCode}, ${orderData.shippingInfo.phone}`;
 
-    // 1. Insert order
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        buyer_id: orderData.userId,
-        seller_id: sellerId,
-        total_amount: orderData.totalAmount,
-        status: orderData.status,
-        shipping_address: shippingAddress
-      })
-      .select()
-      .single();
+    // 1. Group items by seller_id
+    const itemsBySeller = {};
+    for (const item of orderData.items) {
+      let sId = item.seller_id || item.products?.seller_id;
+      if (!sId) {
+        const prodId = item.product_id || item.id;
+        const { data: prodData } = await supabase
+          .from('products')
+          .select('seller_id')
+          .eq('id', prodId)
+          .single();
+        sId = prodData?.seller_id;
+      }
+      if (!sId) {
+        throw new Error(`Product ${item.name || item.title || 'Unknown'} is missing seller information.`);
+      }
+      if (!itemsBySeller[sId]) {
+        itemsBySeller[sId] = [];
+      }
+      itemsBySeller[sId].push(item);
+    }
 
-    if (orderError) throw orderError;
+    const totalSubtotal = orderData.items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const createdOrders = [];
 
-    // 2. Insert order items
-    const orderItems = orderData.items.map(item => ({
-      order_id: order.id,
-      product_id: item.product_id || item.id,
-      quantity: item.quantity,
-      price_at_purchase: item.price
-    }));
+    // 2. Create an order for each seller group
+    for (const [sellerId, items] of Object.entries(itemsBySeller)) {
+      const sellerSubtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+      const sellerGst = sellerSubtotal * 0.18;
+      
+      // Allocate shipping cost (450) proportionally based on subtotal share
+      const shippingShare = totalSubtotal > 0 ? (sellerSubtotal / totalSubtotal) * 450 : 0;
+      const sellerTotal = Number((sellerSubtotal + sellerGst + shippingShare).toFixed(2));
 
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          buyer_id: orderData.userId,
+          seller_id: sellerId,
+          total_amount: sellerTotal,
+          status: orderData.status,
+          shipping_address: shippingAddress
+        })
+        .select()
+        .single();
 
-    if (itemsError) throw itemsError;
+      if (orderError) throw orderError;
+
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_id: item.product_id || item.id,
+        quantity: item.quantity,
+        price_at_purchase: item.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      createdOrders.push(order);
+    }
 
     // 3. Clear database cart
     const { error: cartError } = await supabase
@@ -344,7 +383,7 @@ export const orderService = {
       console.error('Failed to clear database cart after order creation:', cartError);
     }
 
-    return order;
+    return createdOrders[0];
   },
 
   async updateOrderStatus(orderId, status) {

@@ -174,7 +174,7 @@ const BuyerHome = () => {
 
               <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
                 <span className="text-secondary font-headline font-bold text-xs uppercase tracking-wider mb-2 block">{p0.category || 'NEW ARRIVAL'}</span>
-                <Link to={p0.id === 'placeholder' ? '/products' : `/product/${p0.id}`} className="hover:underline">
+                <Link to={p0.id === 'placeholder' ? '/products' : `/product/${p0.id}`}>
                   <h3 className="text-white text-3xl font-headline font-bold line-clamp-1 mb-2">{p0.name}</h3>
                 </Link>
                 <p className="text-gray-300 text-sm font-medium line-clamp-2 mb-4 max-w-lg">{p0.description}</p>
@@ -212,7 +212,7 @@ const BuyerHome = () => {
 
               <div className="absolute bottom-4 left-4 right-4 z-10">
                 <span className="text-secondary font-headline font-bold text-[10px] uppercase tracking-wider block">{p1.category || 'HOME'}</span>
-                <Link to={p1.id === 'placeholder' ? '/products' : `/product/${p1.id}`} className="text-white font-headline font-bold line-clamp-1 hover:underline mb-1">{p1.name}</Link>
+                <Link to={p1.id === 'placeholder' ? '/products' : `/product/${p1.id}`} className="text-white font-headline font-bold line-clamp-1 mb-1">{p1.name}</Link>
                 <span className="text-white/95 font-bold text-sm">₹{formatPrice(p1.price)}</span>
               </div>
             </div>
@@ -242,7 +242,7 @@ const BuyerHome = () => {
 
               <div className="absolute bottom-4 left-4 right-4 z-10">
                 <span className="text-secondary font-headline font-bold text-[10px] uppercase tracking-wider block">{p2.category || 'HOME'}</span>
-                <Link to={p2.id === 'placeholder' ? '/products' : `/product/${p2.id}`} className="text-white font-headline font-bold line-clamp-1 hover:underline mb-1">{p2.name}</Link>
+                <Link to={p2.id === 'placeholder' ? '/products' : `/product/${p2.id}`} className="text-white font-headline font-bold line-clamp-1 mb-1">{p2.name}</Link>
                 <span className="text-white/95 font-bold text-sm">₹{formatPrice(p2.price)}</span>
               </div>
             </div>
@@ -273,7 +273,7 @@ const BuyerHome = () => {
               <div className="absolute bottom-6 left-6 right-6 z-10 flex justify-between items-end">
                 <div>
                   <span className="bg-secondary text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 inline-block">{p3.category || 'PREMIUM TECH'}</span>
-                  <Link to={p3.id === 'placeholder' ? '/products' : `/product/${p3.id}`} className="text-white text-2xl font-headline font-bold hover:underline block line-clamp-1">{p3.name}</Link>
+                  <Link to={p3.id === 'placeholder' ? '/products' : `/product/${p3.id}`} className="text-white text-2xl font-headline font-bold block line-clamp-1">{p3.name}</Link>
                 </div>
                 <div className="text-white font-headline font-bold text-lg whitespace-nowrap bg-black/40 backdrop-blur-xs px-4 py-2 rounded-xl border border-white/10">
                   ₹{formatPrice(p3.price)}

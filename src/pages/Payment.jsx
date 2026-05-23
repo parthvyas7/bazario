@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useCartStore } from '../stores/cartStore';
 import { useAuthStore } from '../stores/authStore';
 import { orderService, authService, formatPrice } from '../utils/services';
@@ -29,7 +29,7 @@ const Payment = () => {
   const [isVerifyingUpi, setIsVerifyingUpi] = useState(false);
 
   // Status states
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState('idle'); // 'idle' | 'processing' | 'success_screen' | 'confirmed_dialog'
   const [processingStep, setProcessingStep] = useState(0);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const Payment = () => {
       }
     }
 
-    setIsProcessing(true);
+    setPaymentStatus('processing');
     setProcessingStep(0);
 
     // Step-by-step processing simulation
@@ -129,7 +129,7 @@ const Payment = () => {
       const finalOrderData = {
         ...orderData,
         paymentMethod,
-        status: 'Paid'
+        status: 'Pending'
       };
 
       // 1. Create order in DB
@@ -144,13 +144,18 @@ const Payment = () => {
         }
       }
 
-      // 3. Clear cart and redirect
+      // 3. Clear cart
       clearCart();
-      navigate('/order-confirmation', { replace: true });
+
+      // 4. Transition to success screen, then confirmation dialog
+      setPaymentStatus('success_screen');
+      setTimeout(() => {
+        setPaymentStatus('confirmed_dialog');
+      }, 1500);
     } catch (err) {
       console.error('Order placement failed:', err);
-      alert('Payment succeeded, but placing order failed. Please contact support.');
-      setIsProcessing(false);
+      alert(`Order placement failed: ${err.message || err}`);
+      setPaymentStatus('idle');
     }
   };
 
@@ -165,28 +170,82 @@ const Payment = () => {
   return (
     <div className="pt-8 pb-20 px-6 max-w-screen-2xl mx-auto min-h-screen relative">
       {/* Simulation overlay */}
-      {isProcessing && (
-        <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-          <div className="bg-surface-container-lowest border border-outline-variant/20 p-10 rounded-2xl max-w-md w-full text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-secondary to-primary animate-pulse"></div>
-            
-            <div className="w-16 h-16 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            
-            <h3 className="font-headline font-extrabold text-xl text-primary mb-2">Processing Payment</h3>
-            <p className="text-on-surface-variant font-medium text-sm animate-pulse">
-              {[
-                'Contacting secure payment gateway...',
-                'Authorizing transaction amount...',
-                'Confirming order with merchants...',
-                'Finalizing your order...'
-              ][processingStep]}
-            </p>
-            
-            <div className="mt-8 text-xs text-outline flex items-center justify-center gap-1">
-              <span className="material-symbols-outlined text-sm">lock</span>
-              Secure 256-bit SSL encrypted connection
+      {paymentStatus !== 'idle' && (
+        <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-md z-[100] flex items-center justify-center p-6 animate-fade-in">
+          
+          {/* PROCESSING STATE */}
+          {paymentStatus === 'processing' && (
+            <div className="bg-surface-container-lowest border border-outline-variant/20 p-10 rounded-2xl max-w-md w-full text-center shadow-2xl relative overflow-hidden transform scale-95 animate-scale-up">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-secondary to-primary animate-pulse"></div>
+              
+              <div className="w-16 h-16 border-4 border-secondary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+              
+              <h3 className="font-headline font-extrabold text-xl text-primary mb-2">Processing Payment</h3>
+              <p className="text-on-surface-variant font-medium text-sm animate-pulse">
+                {[
+                  'Contacting secure payment gateway...',
+                  'Authorizing transaction amount...',
+                  'Confirming order with merchants...',
+                  'Finalizing your order...'
+                ][processingStep]}
+              </p>
+              
+              <div className="mt-8 text-xs text-outline flex items-center justify-center gap-1">
+                <span className="material-symbols-outlined text-sm">lock</span>
+                Secure 256-bit SSL encrypted connection
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* SUCCESS SCREEN STATE */}
+          {paymentStatus === 'success_screen' && (
+            <div className="bg-surface-container-lowest border border-outline-variant/20 p-10 rounded-2xl max-w-md w-full text-center shadow-2xl relative overflow-hidden transform scale-95 animate-scale-up">
+              <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500"></div>
+              
+              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600 animate-bounce">
+                <span className="material-symbols-outlined text-4xl" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
+              </div>
+              
+              <h3 className="font-headline font-extrabold text-2xl text-emerald-600 mb-2">Payment Successful!</h3>
+              <p className="text-on-surface-variant font-medium text-sm">
+                Your transaction has been processed securely.
+              </p>
+            </div>
+          )}
+
+          {/* CONFIRMED DIALOG STATE */}
+          {paymentStatus === 'confirmed_dialog' && (
+            <div className="bg-surface-container-lowest p-12 rounded-2xl shadow-2xl max-w-md w-full text-center border border-outline-variant/10 relative overflow-hidden transform scale-95 animate-scale-up">
+              {/* Decorative backdrop */}
+              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary-container/20 to-transparent"></div>
+              
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 relative z-10 text-primary">
+                <span className="material-symbols-outlined text-4xl" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
+              </div>
+              
+              <h1 className="text-3xl font-extrabold font-headline text-primary mb-4 relative z-10">Order Confirmed!</h1>
+              <p className="text-on-surface-variant font-medium mb-10 leading-relaxed relative z-10">
+                Thank you for your purchase. We've received your order and are
+                processing it now. You will receive an email confirmation shortly.
+              </p>
+              
+              <div className="flex flex-col space-y-4 relative z-10">
+                <Link
+                  to="/orders"
+                  className="bg-primary text-white font-bold px-8 py-3.5 rounded-full hover:bg-primary/90 transition-colors shadow-md text-center"
+                >
+                  Review Purchases
+                </Link>
+                <Link
+                  to="/"
+                  className="bg-surface-container-high text-primary font-bold px-8 py-3.5 rounded-full hover:bg-surface-container-highest transition-colors text-center"
+                >
+                  Discover More
+                </Link>
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 
