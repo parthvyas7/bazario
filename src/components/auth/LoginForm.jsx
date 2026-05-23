@@ -23,6 +23,30 @@ const LoginForm = () => {
     }
   }, [user, profile, navigate, redirectTo]);
 
+  const handleGuestBuyerLogin = async () => {
+    clearError();
+    try {
+      const { user: loggedInUser } = await signIn('buyersample@bazario.in', 'Password123!', 'buyer');
+      if (loggedInUser) {
+        navigate(redirectTo);
+      }
+    } catch (err) {
+      console.error('Guest buyer login error:', err);
+    }
+  };
+
+  const handleGuestSellerLogin = async () => {
+    clearError();
+    try {
+      const { user: loggedInUser } = await signIn('sellersample@bazario.in', 'Password123!', 'seller');
+      if (loggedInUser) {
+        navigate('/seller-dashboard');
+      }
+    } catch (err) {
+      console.error('Guest seller login error:', err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
@@ -95,6 +119,37 @@ const LoginForm = () => {
               {error}
             </div>
           )}
+
+          {/* Guest Access Section */}
+          <div className="mb-8 p-6 bg-secondary/5 border border-secondary/10 rounded-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <h3 className="font-headline font-bold text-base text-primary mb-2 flex items-center gap-2 relative z-10">
+              <span className="material-symbols-outlined text-lg">explore</span> Try as Guest
+            </h3>
+            <p className="text-xs text-on-surface-variant mb-4 relative z-10">
+              Freely explore the marketplace features as a guest buyer or guest seller without signing up.
+            </p>
+            <div className="grid grid-cols-2 gap-3 relative z-10">
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={handleGuestBuyerLogin}
+                className="py-3 px-4 rounded-xl bg-gradient-to-r from-secondary to-secondary-container text-white font-headline font-bold text-xs shadow-md shadow-secondary/10 hover:shadow-secondary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <span className="material-symbols-outlined text-sm">shopping_bag</span>
+                Guest Buyer
+              </button>
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={handleGuestSellerLogin}
+                className="py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold text-xs shadow-md shadow-primary/10 hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <span className="material-symbols-outlined text-sm">storefront</span>
+                Guest Seller
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 gap-3 mb-8">
             <button 

@@ -111,16 +111,16 @@ const BuyerHome = () => {
       <main className="flex-grow pt-8 pb-20">
         {/* Hero Section: Editorial Promotional Banner */}
         <section className="px-8 mb-16">
-          <div className="relative w-full h-[500px] rounded-2xl overflow-hidden bg-primary-container flex items-center">
+          <div className="relative w-full h-[380px] md:h-[500px] rounded-2xl overflow-hidden bg-primary-container flex items-center">
             <div className="absolute inset-0 z-0">
-              <img className="w-full h-full object-cover opacity-60" alt="Hero background" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80"/>
+              <img className="w-full h-full object-cover opacity-60" fetchPriority="high" loading="eager" alt="Hero background" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80"/>
               <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/40 to-transparent"></div>
             </div>
-            <div className="relative z-10 max-w-2xl pl-12 text-white">
-              <span className="font-headline font-bold uppercase tracking-widest text-secondary mb-4 block">The Indian Merchant</span>
-              <h1 className="text-6xl font-headline font-extrabold tracking-tight mb-6 leading-tight">Authentic Indian Craftsmanship, Reimagined.</h1>
-              <p className="text-xl text-primary-fixed leading-relaxed mb-8 font-body">From artisanal home decor to cutting-edge electronics, discover the best of Bharat’s creative landscape.</p>
-              <Link to="/products" className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold shadow-lg hover:scale-105 transition-transform inline-block">Explore the Collection</Link>
+            <div className="relative z-10 max-w-2xl px-6 md:px-0 md:pl-12 text-white">
+              <span className="font-headline font-bold uppercase tracking-widest text-secondary mb-2 md:mb-4 block text-xs md:text-sm">The Indian Merchant</span>
+              <h1 className="text-3xl sm:text-4xl md:text-6xl font-headline font-extrabold tracking-tight mb-4 md:mb-6 leading-tight">Authentic Indian Craftsmanship, Reimagined.</h1>
+              <p className="text-sm sm:text-base md:text-xl text-primary-fixed leading-relaxed mb-6 md:mb-8 font-body">From artisanal home decor to cutting-edge electronics, discover the best of Bharat’s creative landscape.</p>
+              <Link to="/products" className="px-6 py-3 md:px-8 md:py-4 rounded-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold shadow-lg hover:scale-105 transition-transform inline-block text-sm md:text-base">Explore the Collection</Link>
             </div>
           </div>
         </section>
@@ -148,9 +148,9 @@ const BuyerHome = () => {
           <h2 className="text-3xl font-headline font-extrabold mb-8 tracking-tight flex items-center gap-2">
             New Arrivals <span className="w-12 h-1 bg-secondary rounded-full"></span>
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[600px]">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-auto md:h-[600px]">
             {/* Slot 1: Major Card (Latest Product) */}
-            <div className="md:col-span-2 md:row-span-2 bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow">
+            <div className="md:col-span-2 md:row-span-2 bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow h-[380px] md:h-full">
               <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={p0.name} src={p0.image_url || "/placeholder-image.png"}/>
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent"></div>
               
@@ -172,15 +172,15 @@ const BuyerHome = () => {
                 </button>
               )}
 
-              <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
-                <span className="text-secondary font-headline font-bold text-xs uppercase tracking-wider mb-2 block">{p0.category || 'NEW ARRIVAL'}</span>
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 z-10">
+                <span className="text-secondary font-headline font-bold text-[10px] md:text-xs uppercase tracking-wider mb-2 block">{p0.category || 'NEW ARRIVAL'}</span>
                 <Link to={p0.id === 'placeholder' ? '/products' : `/product/${p0.id}`}>
-                  <h3 className="text-white text-3xl font-headline font-bold line-clamp-1 mb-2">{p0.name}</h3>
+                  <h3 className="text-white text-2xl md:text-3xl font-headline font-bold line-clamp-1 mb-2">{p0.name}</h3>
                 </Link>
-                <p className="text-gray-300 text-sm font-medium line-clamp-2 mb-4 max-w-lg">{p0.description}</p>
+                <p className="text-gray-300 text-xs md:text-sm font-medium line-clamp-2 mb-3 md:mb-4 max-w-xs md:max-w-lg">{p0.description}</p>
                 <div className="flex items-baseline gap-1">
                   <span className="text-secondary font-headline font-bold">₹</span>
-                  <span className="text-2xl font-headline font-extrabold text-white">
+                  <span className="text-xl md:text-2xl font-headline font-extrabold text-white">
                     {formatPrice(p0.price)}
                   </span>
                 </div>
@@ -188,7 +188,7 @@ const BuyerHome = () => {
             </div>
 
             {/* Slot 2: Top Right Square (2nd Product) */}
-            <div className="bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow h-[240px] md:h-full">
               <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={p1.name} src={p1.image_url || "/placeholder-image.png"}/>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               
@@ -218,7 +218,7 @@ const BuyerHome = () => {
             </div>
 
             {/* Slot 3: Bottom Right Square (3rd Product) */}
-            <div className="bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow h-[240px] md:h-full">
               <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={p2.name} src={p2.image_url || "/placeholder-image.png"}/>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               
@@ -248,7 +248,7 @@ const BuyerHome = () => {
             </div>
 
             {/* Slot 4: Bottom Wide Block (4th Product) */}
-            <div className="md:col-span-2 bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow">
+            <div className="md:col-span-2 bg-surface-container-lowest border border-gray-100 rounded-2xl overflow-hidden relative group shadow-sm hover:shadow-md transition-shadow h-[240px] md:h-full">
               <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt={p3.name} src={p3.image_url || "/placeholder-image.png"}/>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 

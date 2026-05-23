@@ -278,6 +278,9 @@ const RegisterForm = () => {
             Already have an account? 
             <Link to={`/login${location.search}`} className="text-primary font-bold hover:underline underline-offset-4 ml-2">Sign In</Link>
           </p>
+          <div className="mt-4 text-center text-xs text-on-surface-variant border-t border-outline-variant/10 pt-4">
+            Just visiting? <Link to={`/login${location.search}`} className="text-secondary font-bold hover:underline underline-offset-4">Try Instant Guest Access</Link>
+          </div>
         </div>
       </div>
     </main>

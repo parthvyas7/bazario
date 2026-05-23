@@ -2,8 +2,6 @@
 
 Bazario is a premium React-based e-commerce platform powered by Supabase. It features an elegant UI, real-time analytics, role-based workflows for buyers and sellers, and interactive product reviews.
 
-[Stitch Prototype](https://stitch.withgoogle.com/preview/3842891001526214468?node-id=4c6337dc2ea64b3f8b871554f4847ca4)
-
 ## Screenshots
 
 ### Buyer Portal
@@ -42,8 +40,13 @@ npm run dev     # Dev server
 npm run build   # Production build
 ```
 
-## Project Roadmap
+## Roadmap
 - [ ] Login with mobile number
+- [ ] Social logins
+- [ ] Returns and Refunds
+- [ ] Reward points
+- [ ] 2FA or MFA
+- [ ] Email, SMS, In-app notifications
 
 ## License
 
